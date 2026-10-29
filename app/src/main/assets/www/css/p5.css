@@ -1,0 +1,871 @@
+  /* ══════════════════════════════════════════════════════════════════
+     Mode Persona 5  —  rework v2, menggunakan asset dari p5-ui-main
+     Palet: #ff0022 merah / #1cfeff biru / #000000 hitam / #ffffff putih
+     Font: P5UIBold (阿里妈妈数黑体) + Persona5Main + Bebas Neue
+     Tidak ada gambar character (bebas copyright)
+  ══════════════════════════════════════════════════════════════════ */
+
+  body.p5 {
+    --bg: #0d0d0d;
+    --bg-alt: #050505;
+    --card: #0a0a0a;
+    --card-soft: #111111;
+    --border: #ff002233;
+    --border-light: #ff002218;
+    --text: #ffffff;
+    --text-secondary: #f0f0f0;
+    --muted: #909090;
+    --muted2: #6e6e6e;
+    --muted3: #4a4a4a;
+
+    /* warna resmi p5-ui */
+    --accent: #ff0022;
+    --accent-strong: #cc0018;
+    --accent-soft: #ff002218;
+    --accent2: #ff0022;
+    --accent2-soft: #ff002218;
+
+    /* benar = biru tua tegas, salah = merah combat-alert */
+    --correct: #1a3fa0;
+    --correct-strong: #122d78;
+    --wrong: #ff0022;
+    --wrong-strong: #cc001a;
+    --blue: #1cfeff;
+    --blue-strong: #00d4d5;
+
+    --tint-correct-text: #b9cdfa;
+    --tint-wrong-text: #ffb3bd;
+
+    --shadow-card: 4px 4px 0 #ff002244;
+    --radius-lg: 0px;
+    --radius-md: 0px;
+    --radius-sm: 0px;
+
+    background:
+      radial-gradient(ellipse 60% 35% at 8% 8%, rgba(255,0,34,0.22), transparent 55%),
+      radial-gradient(ellipse 40% 50% at 92% 100%, rgba(28,254,255,0.07), transparent 60%),
+      linear-gradient(160deg, #0d0d0d 0%, #1a0505 60%, #0d0d0d 100%);
+    background-attachment: fixed;
+  }
+
+  /* ── P5UI Bold font pada semua teks utama ── */
+  body.p5 h1,
+  body.p5 h2,
+  body.p5 .sectionLabel,
+  body.p5 .themeModeTitle,
+  body.p5 .catName,
+  body.p5 .qNum,
+  body.p5 .doneBanner .title,
+  body.p5 .scoreHero .pct,
+  body.p5 .scoreHero .gradeLabel {
+    font-family: "P5UIBold", "Persona5Main", "Bebas Neue", sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    word-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* ── Button: gaya p5-btn-ctn — hitam, putih, bold, skewX ── */
+  body.p5 button {
+    font-family: "P5UIBold", "Bebas Neue", sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    word-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* pillBtn P5 style — kotak tajam, skew, border putih */
+  body.p5 .pillBtn {
+    border-radius: 0;
+    background: #000;
+    color: #fff;
+    border: 2px solid #fff;
+    transform: skewX(-4deg);
+    box-shadow: 3px 3px 0 rgba(255,0,34,0.5);
+  }
+  body.p5 .pillBtn:hover {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+  }
+  body.p5 .pillBtn.active {
+    background: #ff0022;
+    color: #fff;
+    border-color: #ff0022;
+    box-shadow: 3px 3px 0 rgba(255,0,34,0.7), 0 0 0 2px #ff002244;
+    transform: skewX(-4deg);
+  }
+
+  /* nextBtn / restartBtn P5: hitam dgn aksen merah bawah */
+  body.p5 .nextBtn,
+  body.p5 .restartBtn {
+    background: #000;
+    color: #ff0022;
+    border: 2px solid #ff0022;
+    border-radius: 0;
+    font-family: "P5UIBold", "Bebas Neue", sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    word-spacing: 0.12em;
+    text-transform: uppercase;
+    box-shadow: 4px 4px 0 #ff0022;
+    transform: skewX(-2deg);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  body.p5 .nextBtn:hover,
+  body.p5 .restartBtn:hover {
+    background: #ff0022;
+    color: #fff;
+    transform: skewX(-2deg) translateY(-2px);
+    box-shadow: 4px 6px 0 #88001100;
+  }
+  body.p5 .nextBtn:active,
+  body.p5 .restartBtn:active {
+    transform: skewX(-2deg) translateY(2px);
+    box-shadow: 2px 2px 0 #ff0022;
+  }
+
+  /* ── Header bar: garis merah tebal di atas ── */
+  body.p5 .headerZone::before {
+    height: 6px;
+    background: #ff0022;
+  }
+
+  /* ── pickerHeader: diagonal stripe background (p5-ui style) + P5UI font ── */
+  body.p5 .pickerHeader h1 {
+    font-family: "Persona5Main", "P5UIBold", "Bebas Neue", sans-serif;
+    letter-spacing: 0.02em;
+    text-shadow: 4px 4px 0 #ff0022, -1px -1px 0 #000;
+    color: #fff;
+  }
+  body.p5 .pickerHeader {
+    position: relative;
+    overflow: hidden;
+    background: #000;
+    padding: 36px 0 22px;
+  }
+  body.p5 .pickerHeader::before {
+    content: "";
+    position: absolute;
+    inset: -30% -15%;
+    background: repeating-linear-gradient(
+      -35deg,
+      rgba(255, 0, 34, 0.18) 0px,
+      rgba(255, 0, 34, 0.18) 12px,
+      transparent 12px,
+      transparent 28px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+  body.p5 .pickerHeader::after {
+    content: "";
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: #ff0022;
+    z-index: 2;
+  }
+  body.p5 .pickerHeader > * { position: relative; z-index: 1; }
+
+  /* ── Card: hitam dengan shadow merah bawah-kanan ── */
+  body.p5 .qCard,
+  body.p5 .progressCard,
+  body.p5 .settingsCard,
+  body.p5 .categoryGroup {
+    background: #0a0a0a;
+    border: 1.5px solid #ff002233;
+    border-radius: 0;
+    box-shadow: 4px 4px 0 #ff002244;
+  }
+  /* Potongan sudut acak di KEEMPAT sudut (bukan cuma 1) + rotasi kecil —
+     biar dari jauh kelihatan gak kotak rapi lagi, tapi masih rapi/terbaca. */
+  body.p5 .progressCard {
+    clip-path: polygon(10px 0, calc(100% - 4px) 0, 100% 9px, 100% 100%, 16px 100%, 0 calc(100% - 6px));
+    transform: rotate(-0.7deg);
+  }
+  body.p5 .settingsCard {
+    clip-path: polygon(0 6px, 14px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 8px) 100%, 4px 100%);
+    transform: rotate(0.55deg);
+  }
+
+  /* ── Divider (p5-divider-ctn style): merah solid 4px ── */
+  body.p5 .modeBar {
+    border-bottom: 4px solid #ff0022;
+    background: #000;
+  }
+  body.p5 .filterBar {
+    border-bottom: 3px solid #ff002255;
+    background: #000;
+  }
+  body.p5 header {
+    border-bottom: 4px solid #ff0022;
+    background: #000;
+  }
+
+  /* ── Progress bar: merah flash ── */
+  body.p5 .progressTrack {
+    background: #1a1a1a;
+    border-radius: 0;
+    height: 6px;
+  }
+  body.p5 .progressFill {
+    background: #ff0022;
+    border-radius: 0;
+  }
+
+  /* ── Answer option buttons: p5 combat feel ──
+       (selector dulu salah: ".optGrid button" — elemen aslinya ".options .option",
+       jadi style ini dari dulu gak pernah kepakai. Sudah dibetulkan + dikasih
+       clip-path doodle yang beda-beda tiap baris + rotasi acak-tapi-rapi.) */
+  body.p5 .options .option {
+    background: #0a0a0a;
+    border: 2px solid #333;
+    border-radius: 0;
+    color: #fff;
+    /* Font display P5UIBold huruf-kapital-semua bagus buat judul/tombol
+       pendek, tapi bikin kalimat opsi jawaban yang panjang susah dibaca —
+       jadi opsi jawaban dipakein font biasa yang lebih nyaman dibaca. */
+    font-family: "Segoe UI", "Inter", system-ui, -apple-system, sans-serif;
+    font-weight: 500;
+    letter-spacing: normal;
+    text-transform: none;
+    transition: border-color 0.12s, background 0.12s, transform 0.08s;
+    position: relative;
+    overflow: hidden;
+  }
+  body.p5 .options .option::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: #ff0022;
+    transform: scaleY(0);
+    transition: transform 0.1s;
+    transform-origin: bottom;
+  }
+  body.p5 .options .option:hover:not(.locked) {
+    border-color: #ff0022;
+    background: #ff002212;
+  }
+  body.p5 .options .option:hover:not(.locked)::before {
+    transform: scaleY(1);
+  }
+  /* benar = kuning mustard, salah = merah tua, opsi yang gak kepilih
+     dipudarkan & dijadiin biru tua gelap. */
+  body.p5 .options .option.correct {
+    background: #ffce1b26;
+    border-color: #ffce1b;
+    border-left-width: 4px;
+  }
+  body.p5 .options .option.wrong {
+    background: #80051730;
+    border-color: #800517;
+    border-left-width: 4px;
+    box-shadow: 3px 3px 0 #80051744;
+  }
+  body.p5 .options .option.faded {
+    background: #10162e;
+    border-color: #1c2650;
+    color: #6a739c;
+    opacity: 0.55;
+  }
+  /* Tiap opsi punya potongan sudut & rotasi sendiri — bukan kotak seragam.
+     Cut depth kecil (4-9px) biar teks di dalam gak ke-crop. */
+  body.p5 .options .option:nth-child(5n+1) {
+    clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 14px) 100%, 0 100%, 0 4px);
+    transform: rotate(-0.9deg) translateX(-3px);
+  }
+  body.p5 .options .option:nth-child(5n+2) {
+    clip-path: polygon(0 5px, 5px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 6px) 100%, 3px 100%);
+    transform: rotate(1.1deg) translateX(4px);
+  }
+  body.p5 .options .option:nth-child(5n+3) {
+    clip-path: polygon(4px 0, calc(100% - 3px) 0, 100% 8px, 100% 100%, 11px 100%, 0 calc(100% - 5px));
+    transform: rotate(-1.4deg) translateX(-2px);
+  }
+  body.p5 .options .option:nth-child(5n+4) {
+    clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 5px, 100% 100%, 6px 100%, 0 calc(100% - 3px));
+    transform: rotate(0.7deg) translateX(5px);
+  }
+  body.p5 .options .option:nth-child(5n) {
+    clip-path: polygon(7px 0, 100% 3px, 100% 100%, calc(100% - 4px) 100%, 0 calc(100% - 7px), 0 9px);
+    transform: rotate(-0.4deg) translateX(-4px);
+  }
+  /* Hover: geser dikit TANPA nge-flatten rotasi masing-masing opsi */
+  body.p5 .options .option:nth-child(5n+1):hover:not(.locked) { transform: rotate(-0.9deg) translateX(0px); }
+  body.p5 .options .option:nth-child(5n+2):hover:not(.locked) { transform: rotate(1.1deg) translateX(7px); }
+  body.p5 .options .option:nth-child(5n+3):hover:not(.locked) { transform: rotate(-1.4deg) translateX(1px); }
+  body.p5 .options .option:nth-child(5n+4):hover:not(.locked) { transform: rotate(0.7deg) translateX(8px); }
+  body.p5 .options .option:nth-child(5n):hover:not(.locked)   { transform: rotate(-0.4deg) translateX(-1px); }
+  body.p5 .letterBadge.correct {
+    background: #2e4d80;
+    color: #fff;
+    border-radius: 0;
+  }
+  body.p5 .letterBadge.wrong {
+    background: #ff0022;
+    color: #fff;
+    border-radius: 0;
+  }
+
+  /* ── doneBanner: P5 all-clear style ── */
+  body.p5 .doneBanner {
+    background: #ff0022;
+    border: none;
+    border-radius: 0;
+    border-left: 6px solid #fff;
+  }
+  body.p5 .doneBanner .title { color: #fff; font-family: "P5UIBold", "Bebas Neue", sans-serif; }
+  body.p5 .doneBanner .sub { color: rgba(255,255,255,0.85); }
+
+  /* ── Score hero ── */
+  body.p5 .scoreHero {
+    background: #000;
+    border: 2px solid #ff0022;
+    border-radius: 0;
+    box-shadow: 6px 6px 0 #ff002266;
+  }
+  body.p5 .scoreHero .pct { color: #ff0022; text-shadow: 3px 3px 0 #fff; }
+  body.p5 .scoreHero .gradeLabel { color: #fff; }
+
+  /* ── Settings card: theme toggle buttons ── */
+  body.p5 .themeModeOption {
+    border-radius: 0;
+    border: 2px solid #333;
+    background: #0a0a0a;
+    font-family: "P5UIBold", "Bebas Neue", sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transform: skewX(-4deg);
+  }
+  body.p5 .themeModeOption.active {
+    background: #ff0022;
+    border-color: #ff0022;
+    color: #fff;
+    box-shadow: 3px 3px 0 #88001166;
+  }
+  body.p5 .themeModeToggle {
+    border-radius: 0;
+    background: #000;
+    border: 2px solid #ff0022;
+    transform: skewX(-4deg);
+  }
+
+  /* ── Package picker items: P5 menu style ── */
+  body.p5 .categoryHeader {
+    border-radius: 0;
+    font-family: "P5UIBold", "Bebas Neue", sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-left: 4px solid transparent;
+  }
+  body.p5 .categoryHeader:hover,
+  body.p5 .categoryHeader.open {
+    background: #ff002215;
+    border-left-color: #ff0022;
+  }
+  body.p5 .packageItem {
+    border-radius: 0;
+    border-top: 1px solid #ff002220;
+    padding-left: 24px;
+    position: relative;
+    font-family: "P5UIBold", "Bebas Neue", sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+  }
+  body.p5 .packageItem:hover {
+    background: #ff002215;
+  }
+  body.p5 .packageItem {
+    overflow: hidden;
+  }
+  body.p5 .packageItem.active {
+    background: #ff002225;
+    border-left: 4px solid #ff0022;
+    position: relative;
+  }
+  body.p5 .packageItem.active::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #ff0022;
+    mix-blend-mode: difference;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body.p5 .packageItem.active > * {
+    position: relative;
+    z-index: 1;
+  }
+  body.p5 .packageItem.active .pkgTitle::before {
+    content: "▶  ";
+    color: inherit;
+  }
+
+  /* ── pkgSwitchBtn ── */
+  body.p5 .pkgSwitchBtn {
+    border-radius: 0;
+    border: 2px solid #ff002244;
+    font-family: "P5UIBold", "Bebas Neue", sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transform: skewX(-4deg);
+  }
+  body.p5 .pkgSwitchBtn:hover {
+    border-color: #ff0022;
+    background: #ff002215;
+    color: #ff0022;
+  }
+
+  /* ── resetBtn ── */
+  body.p5 .resetBtn {
+    border-radius: 0;
+    border: 2px solid #333;
+    font-family: "P5UIBold", "Bebas Neue", sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    transform: skewX(-4deg);
+  }
+
+  /* ── Volume slider: P5UIBold thumb ── */
+  body.p5 .volumeSlider {
+    border-radius: 0;
+    background: #222;
+  }
+  body.p5 .volumeSlider::-webkit-slider-thumb {
+    border-radius: 0;
+    background: #ff0022;
+    border: 2px solid #fff;
+    transform: rotate(45deg);
+  }
+  body.p5 .volumeSlider::-moz-range-thumb {
+    border-radius: 0;
+    background: #ff0022;
+    border: 2px solid #fff;
+    transform: rotate(45deg);
+  }
+
+  /* ── Scrollbar: p5-scrollbar style ── */
+  body.p5 ::-webkit-scrollbar { width: 6px; height: 6px; background: transparent; }
+  body.p5 ::-webkit-scrollbar-thumb { background: #ff0022; }
+  body.p5 ::-webkit-scrollbar-corner { display: none; }
+
+  /* ── "Polygon-wiggle" on package select (p5-ui title.scss bgBlue/bgRed) ── */
+  body.p5 .packageItem { overflow: visible; }
+  body.p5 .packageItem.p5WiggleSelect::before,
+  body.p5 .packageItem.p5WiggleSelect::after {
+    content: "";
+    position: absolute;
+    top: -10%; left: -10%; width: 120%; height: 120%;
+    z-index: -1;
+    pointer-events: none;
+  }
+  body.p5 .packageItem.p5WiggleSelect::before {
+    background-color: #1cfeff;
+    animation: p5WiggleBlue 0.48s ease-out 1;
+  }
+  body.p5 .packageItem.p5WiggleSelect::after {
+    mix-blend-mode: screen;
+    background-color: #ff0022;
+    animation: p5WiggleRed 0.48s ease-out 1;
+  }
+  @keyframes p5WiggleBlue {
+    0%   { top: 6%;  transform: skew(-30deg, -2deg) scale(0.7); }
+    20%  { top: 3%;  transform: skew(45deg, 4deg) scale(0.8); }
+    40%  { top: -2%; transform: skew(-20deg, -2deg) scale(0.9); }
+    60%  { top: -4%; transform: skew(20deg, 2deg) scale(1); }
+    80%  { top: 3%;  transform: skew(-45deg, -4deg) scale(0.85); }
+    100% { top: 0;   transform: skew(0deg, 0deg) scale(1); opacity: 0; }
+  }
+  @keyframes p5WiggleRed {
+    0%   { top: -4%; transform: skew(45deg, 4deg) scale(1); }
+    20%  { top: -1%; transform: skew(-30deg, -3deg) scale(0.9); }
+    40%  { top: 2%;  transform: skew(60deg, 6deg) scale(0.75); }
+    60%  { top: 3%;  transform: skew(-20deg, -2deg) scale(0.7); }
+    80%  { top: -2%; transform: skew(30deg, 3deg) scale(0.85); }
+    100% { top: 0;   transform: skew(0deg, 0deg) scale(1); opacity: 0; }
+  }
+
+  /* ── Ikon "jawaban salah": close.png dari p5-ui upload ── */
+  body.p5 .icon.no { color: var(--wrong); }
+  body.p5 .icon.no::after {
+    content: "";
+    display: inline-block;
+    width: 14px; height: 14px;
+    background: url("../images/theme/p5/icon-no.png") center/contain no-repeat;
+    vertical-align: middle;
+    margin-left: 2px;
+  }
+
+  /* ── Ikon "jawaban benar": star ── */
+  body.p5 .icon.ok {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+  }
+  body.p5 .icon.ok::after {
+    content: "";
+    display: inline-block;
+    width: 14px; height: 14px;
+    background: url("../images/theme/p5/icon-ok.png") center/contain no-repeat;
+    vertical-align: middle;
+  }
+
+  /* ── sectionLabel: gaya p5-divider ── */
+  body.p5 .sectionLabel {
+    position: relative;
+    font-family: "P5UIBold", "Bebas Neue", sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #fff;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+  }
+  body.p5 .sectionLabel::after {
+    content: "";
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 4px;
+    background: #ff0022;
+    border-radius: 2px;
+  }
+
+  /* ── Sword: nusuk jawaban yang dipilih di P5 mode ──
+       Posisi & animasinya di-drive JS via Web Animations API (elemen.animate()),
+       BUKAN class+@keyframes lagi — supaya bisa retarget X/Y & sudut tiap klik,
+       dan supaya replay-nya gak macet kalau jawaban berikutnya diklik cepat
+       (animate() selalu bikin instance baru, animasi lama di-cancel eksplisit
+       di JS, jadi gak ada lagi timer nyangkut yang bikin "sekali doang muncul").
+       transform-origin di taruh persis di UJUNG mata pedang (bukan gagang),
+       jadi titik itu yang "menancap" tepat di jawaban. */
+  .p5-sword-overlay {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 150px;
+    width: auto;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    transform-origin: 52% 99%;
+    /* Gambar sword-nya sendiri banyak area hitam pekat, jadi kalau cuma
+       ditaruh polos di atas background gelap dia bakal ke-camo (ini bug
+       yang dilaporin). Fix-nya: kasih "aura" putih+merah nempel di siluet
+       lewat numpuk beberapa drop-shadow blur kecil sampai besar — hasilnya
+       pedangnya jadi kebungkus glow terang, jelas kelihatan di background
+       hitam apa pun, sekalian nambah kesan "flashy" ala P5. */
+    filter:
+      drop-shadow(0 0 2px #fff)
+      drop-shadow(0 0 5px #fff)
+      drop-shadow(0 0 12px #ff0022)
+      drop-shadow(0 0 24px #ff0022)
+      drop-shadow(3px 4px 2px rgba(0,0,0,0.65));
+  }
+
+  /* ── Impact flash: ledakan cahaya sekilas pas ujung pedang "nancep" ──
+       Elemen terpisah dari sword-nya sendiri supaya efeknya bisa nyala/mati
+       independen dari animasi translate/rotate si pedang. */
+  .p5-sword-flash {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 130px;
+    height: 130px;
+    margin-left: -65px;
+    margin-top: -65px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    opacity: 0;
+    background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,0,34,0.65) 32%, rgba(255,0,34,0) 72%);
+  }
+
+  /* ── Notification banner: hidden by default, only shown in P5 mode ── */
+  .p5Notif {
+    display: none;
+  }
+
+  /* ── Notification banner (correct/wrong): pakai artwork spanduk sobek ala
+       P5 langsung dari gambar CLEAR/FAILED sebagai background — semua
+       teksnya (nama, CLEAR/FAILED) sudah baked-in di gambarnya sendiri,
+       jadi elemen ini murni bingkai + posisi + efek glow, tanpa overlay
+       teks apapun. Aspect-ratio dikunci 1223:344 sesuai artwork aslinya. ── */
+  body.p5 .p5Notif {
+    display: block;
+    position: fixed;
+    top: clamp(52px, 12vw, 80px); left: -460px;
+    width: min(400px, calc(100vw - 32px));
+    aspect-ratio: 1223 / 344;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% 100%;
+    border: none;
+    border-radius: 0;
+    z-index: 9000;
+    box-shadow: none;
+    filter: drop-shadow(3px 5px 2px rgba(0,0,0,0.5));
+    transition: left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s;
+    pointer-events: none;
+  }
+  body.p5 .p5Notif.show { left: 16px; }
+  /* benar = mustard, salah = merah gelap — warna glow-nya ikut skema opsi
+     jawaban (lihat .options .option.correct/.wrong). */
+  body.p5 .p5Notif.p5NotifCorrect {
+    background-image: url("../images/theme/p5/notif-correct.png");
+    filter: drop-shadow(3px 5px 2px rgba(0,0,0,0.5)) drop-shadow(0 0 3px #FFCE1B) drop-shadow(0 0 16px rgba(255,206,27,0.9));
+  }
+  body.p5 .p5Notif.p5NotifWrong {
+    background-image: url("../images/theme/p5/notif-wrong.png");
+    filter: drop-shadow(3px 5px 2px rgba(0,0,0,0.5)) drop-shadow(0 0 3px #800517) drop-shadow(0 0 16px rgba(128,5,23,0.9));
+  }
+
+
+  /* ── Timer circle: P5 style ── */
+  body.p5 .timerCircle {
+    border-radius: 0 !important;
+    transform: rotate(45deg);
+    border-color: #ff0022 !important;
+  }
+  body.p5 .timerText {
+    transform: rotate(-45deg);
+    font-family: "P5UIBold", "Bebas Neue", sans-serif;
+    font-weight: 700;
+    color: #ff0022 !important;
+  }
+
+  /* ── shuffle btn ── */
+  body.p5 .shuffleBtn {
+    border-radius: 0;
+    border: 2px solid #ff002244;
+    font-family: "P5UIBold", "Bebas Neue", sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transform: skewX(-4deg);
+  }
+  body.p5 .shuffleBtn.active {
+    background: #ff0022;
+    color: #fff;
+    border-color: #ff0022;
+    box-shadow: 3px 3px 0 #88001166;
+  }
+
+  /* ── muteBtn ── */
+  body.p5 .muteBtn {
+    border-radius: 0;
+    border: 2px solid #333;
+    transform: skewX(-4deg);
+  }
+  body.p5 .muteBtn.on {
+    background: #ff0022;
+    color: #fff;
+    border-color: #ff0022;
+    box-shadow: 3px 3px 0 #88001166;
+  }
+
+  /* ── hideToggleBtn ── */
+  body.p5 .hideToggleBtn {
+    border-radius: 0;
+    border: 2px solid #333;
+    transform: skewX(-4deg);
+  }
+  body.p5 .hideToggleBtn.active {
+    background: #ff002215;
+    border-color: #ff0022;
+    color: #ff0022;
+  }
+
+  /* ── pickerCloseBtn ── */
+  body.p5 .pickerCloseBtn {
+    border-radius: 0;
+    border: 2px solid #ff002244;
+    font-family: "P5UIBold", "Bebas Neue", sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transform: skewX(-2deg);
+    color: #ff0022;
+  }
+  body.p5 .pickerCloseBtn:hover {
+    background: #ff0022;
+    color: #fff;
+    border-color: #ff0022;
+    box-shadow: 4px 4px 0 #88001166;
+  }
+
+  /* ── statBox, distBar ── */
+  body.p5 .statBox {
+    border-radius: 0;
+    border: 2px solid #ff002244 !important;
+    background: #000 !important;
+    box-shadow: 3px 3px 0 #ff002233;
+  }
+  body.p5 .progressTrack { border-radius: 0; }
+  body.p5 .distBar { border-radius: 0; }
+
+  /* ── qCard: ── */
+  body.p5 .qCard {
+    border-left: 4px solid #ff0022;
+  }
+
+  /* ── Lencana huruf pilihan ganda dipaksa ngikutin skema warna opsi
+       jawaban yang baru (benar = mustard, salah = merah tua) — background
+       gradasinya di-override full di sini + teksnya disesuaikan biar
+       tetap kebaca (gelap di atas mustard yang terang, putih di atas
+       merah tua yang gelap). ── */
+  body.p5 .letter.correct {
+    background: linear-gradient(135deg, #ffce1b, #cc9e00);
+    color: #3a2600;
+  }
+  body.p5 .letter.wrong {
+    background: linear-gradient(135deg, #800517, #58030f);
+    color: #fff;
+  }
+
+  /* ── imgBadge ── */
+  body.p5 .imgBadge {
+    color: #1cfeff;
+    font-family: "P5UIBold", sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 0.68rem;
+  }
+
+  /* ── Ransom/cutout letter effect ─────────────────────────────────────
+     Used on section labels & category names in P5 mode.
+     JS wraps each char in <span class="p5rc">, then nth-child CSS
+     puts a red polygon behind specific chars, inverting their color.
+     mix-blend-mode:difference = automatic invert without knowing bg color.
+     No animation — static, like cut-out newspaper letters.
+  ── */
+  body.p5 .p5-ransom { display: inline; }
+  body.p5 .p5-ransom .p5rc {
+    display: inline-block;
+    position: relative;
+    /* tight tracking within word */
+    letter-spacing: -0.01em;
+  }
+  /* Every ~3rd char gets the red cut-out block */
+  body.p5 .p5-ransom .p5rc.p5rc-inv {
+    background: #ff0022;
+    color: #000;
+    mix-blend-mode: normal;
+    padding: 0 1px;
+    margin: 0 -0.5px;
+    line-height: 1;
+  }
+  /* Slight tilt variation — more organic, less mechanical */
+  body.p5 .p5-ransom .p5rc.p5rc-inv:nth-child(3n+1) { transform: rotate(-2deg) skewX(-3deg); }
+  body.p5 .p5-ransom .p5rc.p5rc-inv:nth-child(3n+2) { transform: rotate(1.5deg) skewX(2deg); }
+  body.p5 .p5-ransom .p5rc.p5rc-inv:nth-child(3n)   { transform: rotate(-1deg); }
+  /* Space chars: no background, just spacing */
+  body.p5 .p5-ransom .p5rc-space {
+    display: inline-block;
+    width: 0.35em;
+  }
+  /* Non-inverted chars stay white, slight random tilt */
+  body.p5 .p5-ransom .p5rc:not(.p5rc-inv):nth-child(5n+2) { transform: rotate(0.8deg); }
+  body.p5 .p5-ransom .p5rc:not(.p5rc-inv):nth-child(7n+3) { transform: rotate(-0.6deg); }
+
+  /* ── Asimetri doodle: potongan 4-sudut + rotasi + geser kecil, beda
+       tiap elemen dalam satu baris/list — supaya dari jauh KELIHATAN
+       gak seragam, bukan cuma "kotak dengan 1 sudut kepotong". ── */
+  body.p5 .statBox:nth-child(3n+1) {
+    clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 8px) 100%, 0 100%, 0 3px);
+    transform: rotate(-2.4deg) translateY(-2px);
+  }
+  body.p5 .statBox:nth-child(3n+2) {
+    clip-path: polygon(0 4px, 4px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 5px) 100%, 0 100%);
+    transform: rotate(1.8deg) translateY(3px);
+  }
+  body.p5 .statBox:nth-child(3n) {
+    clip-path: polygon(3px 0, calc(100% - 5px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 4px));
+    transform: rotate(-0.9deg) translateY(-1px);
+  }
+  body.p5 .pillBtn:nth-child(3n+1) { transform: skewX(-4deg) rotate(-2.6deg) translateY(-1px); }
+  body.p5 .pillBtn:nth-child(3n+2) { transform: skewX(-3deg) rotate(2.1deg) translateY(2px); }
+  body.p5 .pillBtn:nth-child(3n)   { transform: skewX(-5deg) rotate(-1.2deg); }
+  body.p5 .categoryGroup:nth-child(4n+1) {
+    clip-path: polygon(8px 0, calc(100% - 10px) 0, 100% 8px, 100% 100%, 0 100%, 0 5px);
+    transform: rotate(-0.5deg);
+  }
+  body.p5 .categoryGroup:nth-child(4n+2) {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 14px) 100%, 5px 100%, 0 calc(100% - 3px));
+    transform: rotate(0.6deg);
+  }
+  body.p5 .categoryGroup:nth-child(4n+3) {
+    clip-path: polygon(4px 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% - 9px), 0 6px);
+    transform: rotate(-0.3deg);
+  }
+  body.p5 .categoryGroup:nth-child(4n) {
+    clip-path: polygon(0 5px, 6px 0, calc(100% - 4px) 0, 100% 8px, 100% 100%, 0 100%);
+    transform: rotate(0.8deg);
+  }
+  /* Item paket satu-satu punya kemiringan halus sendiri (list vertikal,
+     jadi rotasi kecil aja biar teks tetap kebaca dan gak numpuk). */
+  body.p5 .packageItem:nth-child(4n+1) { transform: rotate(-0.45deg); }
+  body.p5 .packageItem:nth-child(4n+2) { transform: rotate(0.35deg); }
+  body.p5 .packageItem:nth-child(4n+3) { transform: rotate(-0.25deg); }
+  body.p5 .packageItem:nth-child(4n)   { transform: rotate(0.4deg); }
+  /* Scorecard percent: massive P5 font, red with white outline */
+  body.p5 .scoreHero .pct {
+    color: #fff;
+    -webkit-text-stroke: 2px #ff0022;
+    text-shadow: 4px 4px 0 #ff0022;
+  }
+  /* doneBanner: potongan 4-sudut + rotasi kecil */
+  body.p5 .doneBanner {
+    clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 20px) 100%, 0 100%, 0 5px);
+    transform: rotate(-0.4deg);
+  }
+  /* qCard: 4 variasi potongan + rotasi, muter tiap kartu di list */
+  body.p5 .qList .qCard:nth-child(4n+1) {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 18px), calc(100% - 26px) 100%, 0 100%, 0 6px);
+    transform: rotate(-0.6deg);
+  }
+  body.p5 .qList .qCard:nth-child(4n+2) {
+    clip-path: polygon(18px 0, 100% 0, 100% 100%, 8px 100%, 0 calc(100% - 22px), 0 10px);
+    transform: rotate(0.5deg);
+  }
+  body.p5 .qList .qCard:nth-child(4n+3) {
+    clip-path: polygon(6px 0, calc(100% - 8px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 6px));
+    transform: rotate(-0.3deg);
+  }
+  body.p5 .qList .qCard:nth-child(4n) {
+    clip-path: polygon(0 8px, 10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 18px) 100%, 0 100%);
+    transform: rotate(0.45deg);
+  }
+  /* Explanation block: potongan sudut kiri, gak dirotasi (blok teks panjang) */
+  body.p5 .explanation {
+    clip-path: polygon(9px 0, 100% 0, 100% 100%, 4px 100%, 0 calc(100% - 6px), 0 9px);
+    border-left: 4px solid #ff0022;
+    background: #0f0000;
+    padding: 12px 14px 12px 16px;
+    margin-top: 12px;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+    background:
+      radial-gradient(600px 320px at 12% -8%, #3a2a7a55, transparent 60%),
+      radial-gradient(560px 340px at 110% 12%, #ff5d8f22, transparent 55%),
+      var(--bg);
+    background-attachment: fixed;
+    color: var(--text-secondary);
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: "JetBrains Mono", monospace; }
+  .wrap { width: 100%; max-width: 720px; margin: 0 auto; padding: 0 16px 60px; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }

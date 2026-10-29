@@ -1,0 +1,129 @@
+@font-face{
+  font-family:"P5UIBold";
+  font-weight:700;
+  src:url(../fonts/p5ui-bold.woff2) format("woff2"),
+      url(../fonts/p5ui-bold.woff) format("woff");
+  font-display:swap;
+}
+  @font-face {
+    font-family: 'Persona5Main';
+    src: url('../fonts/Persona5main.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+  :root {
+    /* ── Base palette: deep indigo-night instead of flat near-black ── */
+    --bg: #150f2b;
+    --bg-alt: #0d0920;
+    --card: #201a42;
+    --card-soft: #251e4d;
+    --border: #3a2f6e;
+    --border-light: #2a2255;
+    --text: #f8f4ff;
+    --text-secondary: #d2c6f0;
+    --muted: #9c8cc9;
+    --muted2: #7566a3;
+    --muted3: #4f4278;
+
+    /* ── Accents: warm marigold + bubblegum pink duo, not a single flat hue ── */
+    --accent: #ffb238;
+    --accent-strong: #ff9500;
+    --accent-soft: #ffb23820;
+    --accent2: #ff5d8f;
+    --accent2-soft: #ff5d8f22;
+
+    --correct: #3ddc97;
+    --correct-strong: #17b476;
+    --wrong: #ff6f6f;
+    --wrong-strong: #e5423a;
+    --blue: #6cc9ff;
+    --blue-strong: #2f8fe0;
+
+    /* Teks di atas latar tint transparan (badge, opsi benar/salah, notifikasi) */
+    --tint-correct-text: #a4f4d4;
+    --tint-wrong-text: #ffc3c0;
+
+    --shadow-card: 0 4px 0 rgba(10, 6, 26, 0.55);
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --radius-sm: 10px;
+  }
+
+  /* ── Mode Terang — semua komponen dipakai lewat var(...), jadi cukup timpa token-nya di sini ── */
+  body.light {
+    --bg: #fbf7ff;
+    --bg-alt: #f4eefc;
+    --card: #ffffff;
+    --card-soft: #f7f1ff;
+    --border: #e3d7f7;
+    --border-light: #eee5fa;
+    --text: #241a3f;
+    --text-secondary: #4b3f72;
+    --muted: #7c6da3;
+    --muted2: #9689b8;
+    --muted3: #beb0d9;
+
+    --accent: #d98600;
+    --accent-strong: #b96f00;
+    --accent-soft: #d9860020;
+    --accent2: #d43d76;
+    --accent2-soft: #d43d7618;
+
+    --correct: #17a06a;
+    --correct-strong: #0d8a58;
+    --wrong: #d6453c;
+    --wrong-strong: #b93227;
+    --blue: #2f7fd6;
+    --blue-strong: #1f66b3;
+
+    --tint-correct-text: #0d6b47;
+    --tint-wrong-text: #a3271f;
+
+    --shadow-card: 0 3px 0 rgba(70, 50, 110, 0.1);
+
+    background:
+      radial-gradient(600px 320px at 12% -8%, #d9860018, transparent 60%),
+      radial-gradient(560px 340px at 110% 12%, #d43d7614, transparent 55%),
+      var(--bg);
+  }
+
+  /* Mode Koceng — krem hangat + oranye, stiker meme kucing random (images/theme/koceng) */
+  body.koceng {
+    --bg: #fff4e0; --bg-alt: #ffe9c7;
+    --card: #fffdf8; --card-soft: #fff6e6;
+    --border: #f0d3a3; --border-light: #f6e3c0;
+    --text: #3a2412; --text-secondary: #6b4a2b;
+    --muted: #9a7650; --muted2: #b5946b; --muted3: #d9c1a0;
+    --accent: #ff8a1f; --accent-strong: #e06d00; --accent-soft: #ff8a1f20;
+    --accent2: #ff6b9a; --accent2-soft: #ff6b9a20;
+    --correct: #2fa56b; --correct-strong: #1f8a55;
+    --wrong: #e0483c; --wrong-strong: #bf362b;
+    --blue: #3d8fd6; --blue-strong: #2a72b3;
+    --tint-correct-text: #14683f; --tint-wrong-text: #9a2a21;
+    --shadow-card: 0 3px 0 rgba(120, 70, 20, 0.12);
+    background:
+      radial-gradient(600px 320px at 12% -8%, #ff8a1f22, transparent 60%),
+      radial-gradient(560px 340px at 110% 12%, #ff6b9a1c, transparent 55%),
+      var(--bg);
+  }
+
+  /* Mode Capy Masbro — hijau sage + cokelat tanah, stiker capybara random (images/theme/capy) */
+  body.capy {
+    --bg: #eef2e3; --bg-alt: #e0e8cf;
+    --card: #fbfcf6; --card-soft: #f2f6e8;
+    --border: #cbd8b0; --border-light: #dce6c7;
+    --text: #2b2a1c; --text-secondary: #55523a;
+    --muted: #82805f; --muted2: #a09e7f; --muted3: #c9c8ae;
+    --accent: #a8743a; --accent-strong: #8a5b27; --accent-soft: #a8743a20;
+    --accent2: #5f9a5a; --accent2-soft: #5f9a5a20;
+    --correct: #2f9e5e; --correct-strong: #1f8049;
+    --wrong: #d4513f; --wrong-strong: #b03d2e;
+    --blue: #3d8fb0; --blue-strong: #2b7391;
+    --tint-correct-text: #14683a; --tint-wrong-text: #9a2d1f;
+    --shadow-card: 0 3px 0 rgba(80, 90, 40, 0.14);
+    background:
+      radial-gradient(600px 320px at 12% -8%, #a8743a1c, transparent 60%),
+      radial-gradient(560px 340px at 110% 12%, #5f9a5a1c, transparent 55%),
+      var(--bg);
+  }

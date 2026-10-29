@@ -1,0 +1,768 @@
+  /* ══════════════════════════════════════════════════════════════════
+     Mode Spy x Family — Kawaii / pastel pink + mint green
+     Palet: #FFB6C1 pink / #98E8D4 mint / #FFF0F5 lavender-white
+     Characters: Anya (chibi), Loid, Yor, Bond
+  ══════════════════════════════════════════════════════════════════ */
+
+  body.sxf {
+    --bg: #fff0f9;
+    --bg-alt: #ffe8f4;
+    --card: #ffffff;
+    --card-soft: #fff5fb;
+    --border: #f7c1da;
+    --border-light: #fde0ee;
+    --text: #3d1a2e;
+    --text-secondary: #6b3050;
+    --muted: #b07090;
+    --muted2: #c898ae;
+    --muted3: #e0bacb;
+
+    /* Accent: bubblegum pink + mint teal */
+    --accent: #e8557a;
+    --accent-strong: #cc3360;
+    --accent-soft: #e8557a22;
+    --accent2: #2bbfa0;
+    --accent2-soft: #2bbfa018;
+
+    --correct: #2bbfa0;
+    --correct-strong: #1e9e83;
+    --wrong: #e8557a;
+    --wrong-strong: #cc3360;
+    --blue: #7c9fe8;
+    --blue-strong: #5479d6;
+
+    --tint-correct-text: #0d6b57;
+    --tint-wrong-text: #8b1a3a;
+
+    --shadow-card: 0 4px 0 rgba(232, 85, 122, 0.12);
+    --radius-lg: 24px;
+    --radius-md: 18px;
+    --radius-sm: 14px;
+
+    background:
+      radial-gradient(ellipse 80% 50% at -10% -5%, #ffd6e8 0%, transparent 50%),
+      radial-gradient(ellipse 60% 60% at 110% 110%, #c8f0e8 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 50% 0%, #ffe8f4 0%, transparent 60%),
+      radial-gradient(ellipse 40% 35% at 90% 30%, #ffeef8 0%, transparent 50%),
+      #fff0f9;
+    background-attachment: fixed;
+    background-blend-mode: normal, normal, normal, overlay;
+  }
+
+  /* Subtle dot pattern overlay in SxF */
+  body.sxf::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 18% 22%, rgba(255,182,210,0.18) 0%, transparent 38%),
+      radial-gradient(circle at 82% 78%, rgba(160,230,215,0.15) 0%, transparent 40%),
+      radial-gradient(circle at 55% 10%, rgba(255,210,230,0.12) 0%, transparent 32%),
+      radial-gradient(circle at 8%  85%, rgba(200,240,230,0.12) 0%, transparent 30%);
+    pointer-events: none;
+    z-index: 0;
+    animation: sxfBgPulse 10s ease-in-out infinite alternate;
+  }
+  @keyframes sxfBgPulse {
+    0%   { opacity: 0.7; }
+    100% { opacity: 1.0; }
+  }
+  body.sxf #app { position: relative; z-index: 1; }
+
+  /* ── Cards: rounded, soft shadow, slight pink tint ── */
+  body.sxf .qCard,
+  body.sxf .progressCard,
+  body.sxf .settingsCard,
+  body.sxf .categoryGroup {
+    background: rgba(255,255,255,0.92);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 16px rgba(232,85,122,0.10), 0 1px 0 #fff inset;
+    backdrop-filter: blur(8px);
+  }
+
+  /* ── Header: pink gradient bar ── */
+  body.sxf header {
+    background: linear-gradient(135deg, #ff7fa8, #e8557a 60%, #2bbfa0);
+    border-bottom: none;
+    box-shadow: 0 3px 12px rgba(232,85,122,0.25);
+  }
+  body.sxf header h1,
+  body.sxf header .appTitle {
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(180,0,60,0.25);
+    font-family: "Fredoka", "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+  }
+
+  /* ── pickerHeader ── */
+  body.sxf .pickerHeader {
+    background: linear-gradient(135deg, #ff7fa8, #e8557a 50%, #2bbfa0);
+    padding: 40px 0 28px;
+    border-radius: 0 0 32px 32px;
+    box-shadow: 0 4px 20px rgba(232,85,122,0.22);
+  }
+  body.sxf .pickerHeader h1 {
+    color: #fff;
+    font-family: "Fredoka", "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+    text-shadow: 0 2px 10px rgba(140,0,60,0.3), 0 4px 24px rgba(43,191,160,0.2);
+    letter-spacing: 0.02em;
+  }
+  /* Star / heart confetti dots as pickerHeader decoration */
+  body.sxf .pickerHeader::before {
+    content: "✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: rgba(255,255,255,0.15);
+    letter-spacing: 0.8rem;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  body.sxf .pickerHeader::after { display: none; }
+  body.sxf .pickerHeader > * { position: relative; z-index: 1; }
+
+  /* ── Buttons: pill-shaped, pink/mint ── */
+  body.sxf .pillBtn {
+    border-radius: 999px;
+    background: #fff0f6;
+    border: 2px solid var(--border);
+    color: var(--text);
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+  body.sxf .pillBtn:hover {
+    background: #ffccd8;
+    border-color: var(--accent);
+    color: var(--accent-strong);
+    transform: translateY(-1px);
+  }
+  body.sxf .pillBtn.active {
+    background: linear-gradient(135deg, #e8557a, #cc3360);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 3px 10px rgba(232,85,122,0.4);
+  }
+
+  /* ── nextBtn / restartBtn ── */
+  body.sxf .nextBtn,
+  body.sxf .restartBtn {
+    background: linear-gradient(135deg, #e8557a, #cc3360);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(232,85,122,0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  body.sxf .nextBtn:hover,
+  body.sxf .restartBtn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 18px rgba(232,85,122,0.45);
+  }
+  body.sxf .nextBtn:active,
+  body.sxf .restartBtn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 6px rgba(232,85,122,0.3);
+  }
+
+  /* ── Answer options: kawaii rounded ── */
+  body.sxf .options .option {
+    background: rgba(255,255,255,0.88);
+    border: 2.5px solid #f0c0d0;
+    border-radius: 16px;
+    color: var(--text);
+    font-weight: 500;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  body.sxf .options .option::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,200,220,0) 0%, rgba(255,200,220,0.15) 100%);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  body.sxf .options .option:hover:not(.locked) {
+    background: #ffecf2;
+    border-color: #e8557a;
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 4px 14px rgba(232,85,122,0.18);
+  }
+  body.sxf .options .option.correct {
+    background: linear-gradient(135deg, #e8faf5, #d0f5ec);
+    border-color: #2bbfa0;
+    border-width: 3px;
+  }
+  body.sxf .options .option.wrong {
+    background: linear-gradient(135deg, #ffeef3, #ffd6e0);
+    border-color: #e8557a;
+    border-width: 3px;
+  }
+  body.sxf .options .option.faded {
+    opacity: 0.45;
+  }
+
+  /* ── letterBadge ── */
+  body.sxf .letterBadge.correct {
+    background: linear-gradient(135deg, #2bbfa0, #1e9e83);
+    color: #fff;
+    border-radius: 50%;
+  }
+  body.sxf .letterBadge.wrong {
+    background: linear-gradient(135deg, #e8557a, #cc3360);
+    color: #fff;
+    border-radius: 50%;
+  }
+  body.sxf .letter.correct {
+    background: linear-gradient(135deg, #2bbfa0, #1e9e83);
+    color: #fff;
+  }
+  body.sxf .letter.wrong {
+    background: linear-gradient(135deg, #e8557a, #cc3360);
+    color: #fff;
+  }
+
+  /* ── Progress bar: gradient pink-mint ── */
+  body.sxf .progressFill {
+    background: linear-gradient(90deg, #e8557a, #2bbfa0);
+    border-radius: 999px;
+  }
+  body.sxf .progressTrack {
+    background: #fde0ee;
+    border-radius: 999px;
+    height: 8px;
+  }
+
+  /* ── modeBar / filterBar ── */
+  body.sxf .modeBar {
+    background: rgba(255,255,255,0.85);
+    border-bottom: 2px solid var(--border);
+    backdrop-filter: blur(6px);
+  }
+  body.sxf .filterBar {
+    background: rgba(255,255,255,0.7);
+    border-bottom: 1.5px solid #f7d4e3;
+    backdrop-filter: blur(4px);
+  }
+
+  /* ── Score hero ── */
+  body.sxf .scoreHero {
+    background: linear-gradient(135deg, #fff0f6 0%, #e8faf5 100%);
+    border: 2.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 6px 20px rgba(232,85,122,0.12);
+  }
+  body.sxf .scoreHero .pct {
+    color: var(--accent);
+    text-shadow: 0 2px 8px rgba(232,85,122,0.25);
+  }
+
+  /* ── doneBanner ── */
+  body.sxf .doneBanner {
+    background: linear-gradient(135deg, #e8557a, #ff7fa8);
+    border: none;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 16px rgba(232,85,122,0.3);
+  }
+  body.sxf .doneBanner .title { color: #fff; }
+  body.sxf .doneBanner .sub { color: rgba(255,255,255,0.88); }
+
+  /* ── themeModeOption ── */
+  body.sxf .themeModeOption {
+    border-radius: 999px;
+    border: 2px solid var(--border);
+    background: #fff8fc;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+  body.sxf .themeModeOption:hover { border-color: var(--accent); background: #ffecf2; }
+  body.sxf .themeModeOption.active {
+    background: linear-gradient(135deg, #e8557a, #cc3360);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(232,85,122,0.4);
+  }
+  body.sxf .themeModeToggle {
+    border-radius: 999px;
+    background: #fff8fc;
+    border: 2px solid var(--border);
+    font-weight: 600;
+  }
+
+  /* ── categoryHeader / packageItem ── */
+  body.sxf .categoryHeader {
+    border-radius: var(--radius-md);
+    border-left: 4px solid transparent;
+    font-weight: 700;
+    transition: all 0.15s;
+  }
+  body.sxf .categoryHeader:hover,
+  body.sxf .categoryHeader.open {
+    background: #ffecf2;
+    border-left-color: var(--accent);
+  }
+  body.sxf .packageItem {
+    border-radius: var(--radius-sm);
+    border-top: 1px solid #f7d4e3;
+    transition: background 0.12s;
+  }
+  body.sxf .packageItem:hover { background: #fff5f8; }
+  body.sxf .packageItem.active {
+    background: linear-gradient(135deg, #ffecf2, #fff5f8);
+    border-left: 4px solid var(--accent);
+  }
+  body.sxf .packageItem.active .pkgTitle::before { content: "💕  "; }
+
+  /* ── pkgSwitchBtn ── */
+  body.sxf .pkgSwitchBtn {
+    border-radius: 999px;
+    border: 2px solid var(--border);
+    font-weight: 600;
+    background: #fff8fc;
+    transition: all 0.15s;
+  }
+  body.sxf .pkgSwitchBtn:hover {
+    border-color: var(--accent);
+    background: #ffecf2;
+    color: var(--accent-strong);
+  }
+
+  /* ── Volume slider ── */
+  body.sxf .volumeSlider::-webkit-slider-thumb {
+    background: var(--accent);
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(232,85,122,0.4);
+  }
+  body.sxf .volumeSlider::-moz-range-thumb {
+    background: var(--accent);
+    border-radius: 50%;
+    border: 2px solid #fff;
+  }
+
+  /* ── Scrollbar ── */
+  body.sxf ::-webkit-scrollbar { width: 6px; height: 6px; background: transparent; }
+  body.sxf ::-webkit-scrollbar-thumb { background: #f0b0c5; border-radius: 999px; }
+
+  /* ── sectionLabel: pink underline ── */
+  body.sxf .sectionLabel {
+    position: relative;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  body.sxf .sectionLabel::after {
+    content: "";
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, #e8557a, #2bbfa0);
+    border-radius: 999px;
+  }
+
+  /* ── Spy x Family notification ── */
+  .sxfNotif {
+    display: none;
+    position: fixed;
+    top: 70px;
+    right: -220px;
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.95);
+    border: 3px solid #f0c0d0;
+    box-shadow: 0 6px 24px rgba(232,85,122,0.25);
+    transition: right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+    min-width: 160px;
+    display: none;
+  }
+  body.sxf .sxfNotif {
+    display: flex;
+    right: -220px;
+  }
+  body.sxf .sxfNotif.show { right: 16px; }
+  body.sxf .sxfNotif.sxfCorrect {
+    border-color: #2bbfa0;
+    background: linear-gradient(135deg, #e8faf5, #fff);
+  }
+  body.sxf .sxfNotif.sxfWrong {
+    border-color: #e8557a;
+    background: linear-gradient(135deg, #ffeef3, #fff);
+  }
+  .sxfNotifAnya {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .sxfNotifText {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  /* text set by JS */
+  /* text set by JS */
+
+  /* ── Anya bounce on correct answer ── */
+  @keyframes anyaBounce {
+    0%   { transform: scale(1) rotate(0deg); }
+    25%  { transform: scale(1.2) rotate(-5deg); }
+    50%  { transform: scale(0.95) rotate(3deg); }
+    75%  { transform: scale(1.1) rotate(-2deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+  body.sxf .sxfNotif.sxfCorrect .sxfNotifAnya {
+    animation: anyaBounce 0.6s ease-out;
+  }
+  @keyframes anyaShake {
+    0%   { transform: rotate(0deg); }
+    20%  { transform: rotate(-8deg); }
+    40%  { transform: rotate(8deg); }
+    60%  { transform: rotate(-5deg); }
+    80%  { transform: rotate(5deg); }
+    100% { transform: rotate(0deg); }
+  }
+  body.sxf .sxfNotif.sxfWrong .sxfNotifAnya {
+    animation: anyaShake 0.5s ease-out;
+  }
+
+  /* ── statBox ── */
+  body.sxf .statBox {
+    border-radius: var(--radius-md);
+    border: 2px solid var(--border) !important;
+    background: rgba(255,255,255,0.9) !important;
+    box-shadow: 0 2px 8px rgba(232,85,122,0.08);
+  }
+  body.sxf .distBar { border-radius: 999px; }
+
+  /* ── qCard: soft pink left border ── */
+  body.sxf .qCard {
+    border-left: 4px solid #f0c0d0;
+  }
+  body.sxf .qCard:hover { border-left-color: var(--accent); }
+
+  /* ── resetBtn ── */
+  body.sxf .resetBtn {
+    border-radius: 999px;
+    border: 2px solid var(--border);
+    background: #fff8fc;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+  body.sxf .resetBtn:hover { border-color: var(--accent); background: #ffecf2; }
+
+  /* ── pickerCloseBtn ── */
+  body.sxf .pickerCloseBtn {
+    border-radius: 999px;
+    border: 2px solid var(--border);
+    background: #fff8fc;
+    font-weight: 600;
+    color: var(--accent);
+    transition: all 0.15s;
+  }
+  body.sxf .pickerCloseBtn:hover {
+    background: linear-gradient(135deg, #e8557a, #cc3360);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 3px 10px rgba(232,85,122,0.4);
+  }
+
+  /* ── hideToggleBtn ── */
+  body.sxf .hideToggleBtn {
+    border-radius: 999px;
+    background: rgba(255,255,255,0.85);
+    border: 2px solid var(--border);
+    backdrop-filter: blur(4px);
+  }
+  body.sxf .hideToggleBtn.active {
+    background: #ffecf2;
+    border-color: var(--accent);
+    color: var(--accent-strong);
+  }
+
+  /* ── pkgSubtitle with Anya icon ── */
+  body.sxf .pkgSubtitle::before {
+    content: "";
+    display: inline-block;
+    width: 16px; height: 16px;
+    background: url("../images/theme/sxf/pkgsubtitle.png") center/contain no-repeat;
+    vertical-align: middle;
+    margin-right: 4px;
+    border-radius: 50%;
+  }
+
+
+  /* ── SxF character icons ── */
+  /* Loid/Twilight in header as spy logo */
+  body.sxf .headerZone::after {
+    content: "";
+    position: absolute;
+    right: 12px; top: 50%; transform: translateY(-50%);
+    width: 36px; height: 36px;
+    background: url("../images/theme/sxf/pkgsubtitle.png") center/contain no-repeat;
+    filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 6px #fff) drop-shadow(0 1px 3px rgba(0,0,0,0.45));
+    opacity: 0.95;
+    pointer-events: none;
+  }
+  body.sxf .headerZone { position: sticky; top: 0; z-index: 50; }
+
+  /* Bond (dog) floats near correct answers */
+  body.sxf .options .option.correct::after {
+    content: "";
+    position: absolute;
+    right: 8px; top: 50%; transform: translateY(-50%);
+    width: 26px; height: 26px;
+    background: url("../images/theme/sxf/option-correct.png") center/contain no-repeat;
+    filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 4px #fff) drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+    pointer-events: none;
+  }
+
+  /* Damian (pouty rival) on wrong answers */
+  body.sxf .options .option.wrong::after {
+    content: "";
+    position: absolute;
+    right: 8px; top: 50%; transform: translateY(-50%);
+    width: 26px; height: 26px;
+    background: url("../images/theme/sxf/option-wrong.png") center/contain no-repeat;
+    filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 4px #fff) drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+    pointer-events: none;
+  }
+
+  /* Yor (assassin) on the sectionLabel — she's the serious one */
+  body.sxf .sectionLabel::before {
+    content: "";
+    display: inline-block;
+    width: 18px; height: 18px;
+    background: url("../images/theme/sxf/sectionlabel.png") center/contain no-repeat;
+    vertical-align: middle;
+    margin-right: 5px;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 3px #fff) drop-shadow(0 1px 3px rgba(0,0,0,0.5));
+  }
+
+  /* Becky on category headers (chatty friend energy) */
+  body.sxf .categoryHeader .catName::before {
+    content: "";
+    display: inline-block;
+    width: 16px; height: 16px;
+    background: url("../images/theme/sxf/category-catname.png") center/contain no-repeat;
+    vertical-align: middle;
+    margin-right: 4px;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 2px #fff) drop-shadow(0 1px 2px rgba(0,0,0,0.35));
+  }
+
+  /* Handler (spy boss) on settings card */
+  body.sxf .settingsCard .sectionLabel::before {
+    background: url("../images/theme/sxf/settings-sectionlabel.png") center/contain no-repeat !important;
+    border-radius: 50%;
+  }
+
+  /* Loid in pickerHeader subtitle line */
+  body.sxf .pickerHeader .pkgSubtitle::before,
+  body.sxf .pkgSubtitle::before {
+    background: url("../images/theme/sxf/pkgsubtitle.png") center/contain no-repeat;
+    border-radius: 50%;
+  }
+
+  /* doneBanner: Anya icon inline */
+  body.sxf .doneBanner::after {
+    content: "";
+    position: absolute;
+    right: 8px; bottom: -4px;
+    width: 44px; height: 44px;
+    background: url("../images/theme/sxf/donebanner.png") center/contain no-repeat;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+    pointer-events: none;
+    opacity: 0.92;
+  }
+  body.sxf .doneBanner { position: relative; overflow: hidden; }
+
+
+  /* SxF notification per-character variant colours */
+  body.sxf .sxfNotif.sxfV-bond   { border-color: #2bbfa0; background: linear-gradient(135deg, #e0faf4, #fff); }
+  body.sxf .sxfNotif.sxfV-yor    { border-color: #7c5fa0; background: linear-gradient(135deg, #f0ebff, #fff); }
+  body.sxf .sxfNotif.sxfV-becky  { border-color: #f5a623; background: linear-gradient(135deg, #fff8e0, #fff); }
+  body.sxf .sxfNotif.sxfV-anya   { border-color: #e8557a; }
+  /* sxfNotifText: style the JS-set text */
+  body.sxf .sxfNotif.sxfCorrect .sxfNotifText { color: #1e9e83; font-weight: 700; }
+  body.sxf .sxfNotif.sxfWrong .sxfNotifText   { color: #cc3360; font-weight: 700; }
+  body.sxf .sxfNotif.sxfV-yor .sxfNotifText   { color: #5a3a80; }
+  body.sxf .sxfNotif.sxfV-bond .sxfNotifText  { color: #1a8060; }
+  body.sxf .sxfNotif.sxfV-becky .sxfNotifText { color: #a06820; }
+
+
+  /* ── SxF: Kawaii polish & mobile fixes ──────────────────────────── */
+
+  /* Star sparkle decorations on cards */
+  body.sxf .qCard::before {
+    content: "";
+    position: absolute;
+    top: -1px; right: 16px;
+    width: 0; height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 10px solid var(--border);
+    pointer-events: none;
+  }
+  body.sxf .qCard { position: relative; }
+
+  /* Subtle star pattern via SVG bg on body */
+  body.sxf {
+    background-image:
+      radial-gradient(ellipse 120% 60% at 0% 0%, rgba(255,200,220,0.45) 0%, transparent 55%),
+      radial-gradient(ellipse 80% 70% at 100% 0%, rgba(200,240,232,0.35) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 50% at 50% 100%, rgba(255,220,240,0.30) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 15% 60%, rgba(255,230,245,0.25) 0%, transparent 45%),
+      radial-gradient(ellipse 40% 35% at 85% 55%, rgba(210,245,235,0.25) 0%, transparent 45%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ctext x='10' y='22' font-size='11' opacity='0.045' fill='%23e8557a'%3E%E2%9C%A6%3C/text%3E%3Ctext x='50' y='60' font-size='9' opacity='0.035' fill='%232bbfa0'%3E%E2%98%86%3C/text%3E%3Ctext x='22' y='58' font-size='7' opacity='0.04' fill='%23e8557a'%3E%E2%9D%A4%3C/text%3E%3Ctext x='58' y='24' font-size='8' opacity='0.04' fill='%232bbfa0'%3E%E2%9C%A6%3C/text%3E%3Ctext x='6' y='70' font-size='6' opacity='0.03' fill='%23c898ae'%3E%E2%9D%A4%3C/text%3E%3C/svg%3E"),
+      #fdf4f8;
+    background-attachment: fixed;
+    background-attachment: fixed;
+  }
+
+  /* Floating Anya emoji after package active tick */
+  body.sxf .packageItem.active .pkgTitle::before { content: "💕  "; }
+
+  /* Card hover lift */
+  body.sxf .qCard { transition: box-shadow 0.2s, transform 0.15s; }
+  body.sxf .qCard:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(232,85,122,0.13); }
+
+  /* Pink dot separator on filterBar */
+  body.sxf .filterBar { gap: 4px; }
+
+  /* doneBanner text colour contrast fix */
+  body.sxf .doneBanner { padding-right: 56px; }
+
+  /* ── Loid in header: hide on very small screens ── */
+  @media (max-width: 440px) {
+    body.sxf .headerZone::after { display: none; }
+    body.sxf .doneBanner::after { display: none; }
+  }
+
+  /* ── option icons: add right padding so text never underlaps icon ── */
+  body.sxf .options .option.correct,
+  body.sxf .options .option.wrong {
+    padding-right: 44px;
+  }
+  @media (max-width: 360px) {
+    body.sxf .options .option.correct::after,
+    body.sxf .options .option.wrong::after { display: none; }
+    body.sxf .options .option.correct,
+    body.sxf .options .option.wrong { padding-right: inherit; }
+  }
+
+  /* ── sxfNotif: slide from bottom on mobile instead of right ── */
+  @media (max-width: 520px) {
+    body.sxf .sxfNotif {
+      right: 50% !important;
+      transform: translateX(50%) translateY(0);
+      top: auto;
+      bottom: -120px;
+      transition: bottom 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      min-width: 0;
+      width: calc(100vw - 32px);
+      justify-content: center;
+    }
+    body.sxf .sxfNotif.show {
+      bottom: 16px;
+      right: 50% !important;
+    }
+  }
+
+  /* ── Kawaii: rounded pill progress bar label ── */
+  body.sxf .progressLabel {
+    font-family: "Fredoka", "Plus Jakarta Sans", sans-serif;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  /* ── Kawaii: pink scrollbar thumb pulse on hover ── */
+  body.sxf ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  /* ── Kawaii: glowing correct/wrong letterBadge ── */
+  body.sxf .letterBadge.correct {
+    box-shadow: 0 0 0 3px rgba(43,191,160,0.25), 0 2px 6px rgba(43,191,160,0.35);
+  }
+  body.sxf .letterBadge.wrong {
+    box-shadow: 0 0 0 3px rgba(232,85,122,0.25), 0 2px 6px rgba(232,85,122,0.35);
+  }
+
+  /* ── Kawaii: pink pulsing outline on active pillBtn ── */
+  body.sxf .pillBtn.active {
+    animation: sxfPillPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes sxfPillPulse {
+    0%, 100% { box-shadow: 0 3px 10px rgba(232,85,122,0.4); }
+    50% { box-shadow: 0 3px 18px rgba(232,85,122,0.65), 0 0 0 3px rgba(232,85,122,0.2); }
+  }
+
+  /* ── Kawaii: card top accent ribbon ── */
+  body.sxf .categoryGroup {
+    border-top: 3px solid var(--border);
+    overflow: hidden;
+  }
+  body.sxf .categoryGroup::before {
+    content: "";
+    display: block;
+    height: 3px;
+    background: linear-gradient(90deg, #e8557a, #2bbfa0);
+    margin: -3px -1px 0;
+    border-radius: 2px 2px 0 0;
+  }
+
+  /* ── Kawaii: sectionLabel font ── */
+  body.sxf .sectionLabel {
+    font-family: "Fredoka", "Plus Jakarta Sans", sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: var(--accent-strong);
+  }
+
+  /* ── Kawaii: progress numbers in Fredoka ── */
+  body.sxf .scoreHero .pct,
+  body.sxf .qNum {
+    font-family: "Fredoka", "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+  }
+
+  /* ── Kawaii: settingsCard title with hearts ── */
+  body.sxf .settingsCard .sectionLabel::after {
+    background: linear-gradient(90deg, #e8557a, #ff96b3, #2bbfa0);
+  }
+
+  /* ── Kawaii: scoreHero grade label in Fredoka ── */
+  body.sxf .scoreHero .gradeLabel {
+    font-family: "Fredoka", "Plus Jakarta Sans", sans-serif;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  /* ── Kawaii: doneBanner title ── */
+  body.sxf .doneBanner .title {
+    font-family: "Fredoka", "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Kawaii: handler icon in settings sectionLabel ── */
+  body.sxf .settingsCard .sectionLabel::before {
+    filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 3px #fff) drop-shadow(0 1px 3px rgba(0,0,0,0.4)) !important;
+  }

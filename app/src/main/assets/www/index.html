@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Soalin — Belajar? Kau?</title>
+<link rel="icon" href="./favicon-tab.ico" type="image/x-icon">
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#150f2b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Soalin">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/base.css">
+<link rel="stylesheet" href="./css/p5.css">
+<link rel="stylesheet" href="./css/components.css">
+<link rel="stylesheet" href="./css/sxf.css">
+<link rel="stylesheet" href="./css/doksli.css">
+<link rel="stylesheet" href="./css/multiplayer.css">
+<link rel="stylesheet" href="./css/option-explain.css">
+<link rel="stylesheet" href="./css/drop-extras.css">
+</head>
+<body>
+<div id="app"></div>
+<!-- P5 Mode: sword flash overlay + notification bar (no character images) -->
+<img id="p5Sword" class="p5-sword-overlay" src="./images/theme/p5/sword.png" alt="" aria-hidden="true">
+<div id="p5SwordFlash" class="p5-sword-flash" aria-hidden="true"></div>
+<div id="p5Notif" class="p5Notif" aria-live="polite"></div>
+<div id="sxfNotif" class="sxfNotif" aria-live="polite">
+  <img class="sxfNotifAnya" src="./images/theme/sxf/notif-anya.png" alt="Anya">
+  <span class="sxfNotifText"></span>
+</div>
+
+<script src="./js/highlight.js"></script>
+<script src="./js/pdf-reader.js"></script>
+<script src="./js/convert.js"></script>
+
+<!-- Audio manifest di-fetch secara async dari audio/manifest.json (di-generate
+     lewat "npm run audio-manifest"). Kalau file tidak ada, suara tidak bunyi
+     tapi app tetap jalan normal. -->
+<script src="./js/doksli.js"></script>
+<script src="./js/core.js"></script>
+<script src="./js/fx.js"></script>
+<script src="./js/remote-bank.js"></script>
+<script src="./js/state.js"></script>
+<script src="./js/handlers.js"></script>
+<script src="./js/render-cards.js"></script>
+<script src="./js/render-latihan.js"></script>
+<script src="./js/render-tentamen.js"></script>
+<script src="./js/render-picker.js"></script>
+<!-- Firebase (compat) untuk Multiplayer. Config ada di js/firebase-config.js -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="./js/firebase-config.js"></script>
+<script src="./js/multiplayer.js"></script>
+<script src="./js/render-multiplayer.js"></script>
+<script src="./js/main.js"></script>
+<script src="./js/gamepad.js"></script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+}
+</script>
+</body>
+</html>

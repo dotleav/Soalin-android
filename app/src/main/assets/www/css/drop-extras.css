@@ -1,0 +1,10 @@
+/* Kotak drop: daftar format yang didukung + link template di bawahnya. */
+.dropFormats { display: flex; flex-direction: column; gap: 2px; margin-top: 6px; font-size: 0.75rem; color: var(--muted2, var(--muted)); }
+.dropFormats code { font-family: "JetBrains Mono", monospace; font-size: 0.72rem; }
+.templateLink { display: block; text-align: center; margin: 10px 0 4px; font-size: 0.84rem; font-weight: 600; color: var(--accent); text-decoration: underline; }
+
+/* Daftar banyak kuis custom: baris kuis + tombol hapus di sebelahnya. */
+.customRow { display: flex; gap: 6px; align-items: stretch; margin-bottom: 6px; }
+.customRow .packageItem { flex: 1; min-width: 0; }
+.customDelBtn { flex: none; padding: 0 10px; }
+.dropMsg { white-space: pre-line; }

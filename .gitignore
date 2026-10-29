@@ -1,0 +1,17 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+/build
+/app/build
+.DS_Store
+
+# generated, do not track
+build/
+.gradle/
+.idea/
+local.properties
+app/debug/
+
+keystore.properties
+*.jks

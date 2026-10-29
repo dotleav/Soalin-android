@@ -1,0 +1,361 @@
+  /* ══════════════════════════════════════════════════════════════════
+     Mode Doksli — dokumen asli, chaotic meme energy
+     Palet: putih bersih, abu-abu gelap, aksen kuning/merah Indonesia
+  ══════════════════════════════════════════════════════════════════ */
+  body.doksli {
+    --bg: #f5f5f0;
+    --bg-alt: #ececec;
+    --card: #ffffff;
+    --card-soft: #fafafa;
+    --border: #d0d0cc;
+    --border-light: #e0e0dc;
+    --text: #1a1a1a;
+    --text-secondary: #444;
+    --muted: #888;
+    --muted2: #aaa;
+    --muted3: #ccc;
+    --accent: #c0392b;
+    --accent-strong: #96281b;
+    --accent-soft: #c0392b18;
+    --accent2: #e67e22;
+    --accent2-soft: #e67e2218;
+    --correct: #27ae60;
+    --correct-strong: #1e8449;
+    --wrong: #c0392b;
+    --wrong-strong: #96281b;
+    --blue: #2980b9;
+    --blue-strong: #1a5276;
+    --tint-correct-text: #145a32;
+    --tint-wrong-text: #641e16;
+    --shadow-card: 0 2px 8px rgba(0,0,0,0.10);
+    --radius-lg: 8px;
+    --radius-md: 6px;
+    --radius-sm: 4px;
+
+    background: #f0ede8
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='%23f0ede8'/%3E%3Ccircle cx='20' cy='20' r='1' fill='%23c8c4be' opacity='0.5'/%3E%3C/svg%3E");
+    font-family: "Courier New", Courier, monospace;
+  }
+
+  /* Paper texture overlay */
+  body.doksli::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+  body.doksli #app { position: relative; z-index: 1; }
+
+  /* ── Cards: flat, slightly off-white, thin border ── */
+  body.doksli .qCard,
+  body.doksli .progressCard,
+  body.doksli .settingsCard,
+  body.doksli .categoryGroup {
+    background: #fff;
+    border: 1.5px solid #c8c4be;
+    border-radius: 4px;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.08);
+  }
+
+  /* ── Header: merah putih ── */
+  body.doksli header {
+    background: #c0392b;
+    border-bottom: 3px solid #96281b;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  }
+  body.doksli header h1,
+  body.doksli header .appTitle {
+    color: #fff;
+    font-family: "Courier New", Courier, monospace;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* ── Top ribbon: merah putih ── */
+  body.doksli .headerZone { position: sticky; top: 0; z-index: 50; }
+  body.doksli .headerZone::before {
+    background: repeating-linear-gradient(
+      90deg,
+      #c0392b 0px, #c0392b 20px,
+      #fff 20px, #fff 40px
+    ) !important;
+    height: 4px;
+  }
+
+  /* ── pickerHeader: dokumen asli style ── */
+  body.doksli .pickerHeader {
+    background: #c0392b;
+    padding: 32px 0 24px;
+    border-radius: 0;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  }
+  body.doksli .pickerHeader h1 {
+    color: #fff;
+    font-family: "Courier New", Courier, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+  }
+  body.doksli .pickerHeader::before { display: none; }
+  body.doksli .pickerHeader::after  { display: none; }
+
+  /* ── Buttons: sharp, document-like ── */
+  body.doksli .pillBtn {
+    border-radius: 3px;
+    background: #fff;
+    border: 1.5px solid #c8c4be;
+    color: var(--text);
+    font-family: "Courier New", Courier, monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    transition: all 0.1s;
+  }
+  body.doksli .pillBtn:hover { background: #f0ede8; border-color: #888; }
+  body.doksli .pillBtn.active {
+    background: #c0392b;
+    color: #fff;
+    border-color: #96281b;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+  }
+
+  /* ── nextBtn / restartBtn ── */
+  body.doksli .nextBtn,
+  body.doksli .restartBtn {
+    background: #c0392b;
+    color: #fff;
+    border: 2px solid #96281b;
+    border-radius: 4px;
+    font-family: "Courier New", Courier, monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+    transition: all 0.1s;
+  }
+  body.doksli .nextBtn:hover,
+  body.doksli .restartBtn:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
+  }
+  body.doksli .nextBtn:active,
+  body.doksli .restartBtn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+  }
+
+  /* ── Answer options: form-like, clean ── */
+  body.doksli .options .option {
+    background: #fff;
+    border: 1.5px solid #c8c4be;
+    border-radius: 3px;
+    color: var(--text);
+    font-family: "Courier New", Courier, monospace;
+    transition: all 0.1s;
+    box-shadow: 1px 1px 0 rgba(0,0,0,0.06);
+  }
+  body.doksli .options .option:hover:not(.locked) {
+    background: #f5f2ed;
+    border-color: #888;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+  }
+  body.doksli .options .option.correct {
+    background: #eafaf1;
+    border-color: #27ae60;
+    border-width: 2px;
+  }
+  body.doksli .options .option.wrong {
+    background: #fdedec;
+    border-color: #c0392b;
+    border-width: 2px;
+  }
+
+  /* ── Progress bar ── */
+  body.doksli .progressFill {
+    background: #c0392b;
+    border-radius: 2px;
+  }
+  body.doksli .progressTrack {
+    background: #d5d2cd;
+    border-radius: 2px;
+    height: 6px;
+  }
+
+  /* ── Score hero ── */
+  body.doksli .scoreHero {
+    background: #fff;
+    border: 2px solid #c8c4be;
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.1);
+  }
+  body.doksli .scoreHero .pct { color: #c0392b; }
+
+  /* ── doneBanner ── */
+  body.doksli .doneBanner {
+    background: #c0392b;
+    border: 2px solid #96281b;
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.15);
+  }
+  body.doksli .doneBanner .title { color: #fff; text-transform: uppercase; letter-spacing: 0.05em; }
+  body.doksli .doneBanner .sub   { color: rgba(255,255,255,0.85); }
+
+  /* ── sectionLabel ── */
+  body.doksli .sectionLabel {
+    font-family: "Courier New", Courier, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.78rem;
+    color: #888;
+    font-weight: 700;
+  }
+  body.doksli .sectionLabel::after {
+    background: linear-gradient(90deg, #c0392b, #e67e22);
+    height: 2px;
+  }
+  body.doksli .sectionLabel::before { display: none; }
+
+  /* ── categoryHeader ── */
+  body.doksli .categoryHeader {
+    border-left: 3px solid transparent;
+    border-radius: 2px;
+    font-family: "Courier New", Courier, monospace;
+    text-transform: uppercase;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+  body.doksli .categoryHeader:hover,
+  body.doksli .categoryHeader.open {
+    background: #f5f2ed;
+    border-left-color: #c0392b;
+  }
+  body.doksli .categoryHeader .catName::before { display: none; }
+
+  /* ── packageItem ── */
+  body.doksli .packageItem.active {
+    background: #fff9f9;
+    border-left: 3px solid #c0392b;
+  }
+  body.doksli .packageItem.active .pkgTitle::before { content: "▶  "; color: #c0392b; }
+
+  /* ── themeModeOption ── */
+  body.doksli .themeModeOption {
+    border-radius: 3px;
+    border: 1.5px solid #c8c4be;
+    background: #fff;
+    font-family: "Courier New", Courier, monospace;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  body.doksli .themeModeOption.active {
+    background: #c0392b;
+    border-color: #96281b;
+    color: #fff;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+  }
+
+  /* ── letterBadge ── */
+  body.doksli .letterBadge.correct { background: #27ae60; color: #fff; border-radius: 3px; }
+  body.doksli .letterBadge.wrong   { background: #c0392b; color: #fff; border-radius: 3px; }
+  body.doksli .letter.correct { background: #27ae60; color: #fff; border-radius: 3px; }
+  body.doksli .letter.wrong   { background: #c0392b; color: #fff; border-radius: 3px; }
+
+  /* ── Doksli floater images (set by JS) ── */
+  .doksli-floater {
+    position: fixed;
+    z-index: 8000;
+    pointer-events: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25), 0 0 0 2px rgba(255,255,255,0.7);
+  }
+
+  /* ── Scrollbar ── */
+  body.doksli ::-webkit-scrollbar { width: 6px; background: #e8e5e0; }
+  body.doksli ::-webkit-scrollbar-thumb { background: #c0392b; border-radius: 2px; }
+
+  /* ── modeBar / filterBar ── */
+  body.doksli .modeBar {
+    background: rgba(255,255,255,0.95);
+    border-bottom: 1.5px solid #c8c4be;
+  }
+  body.doksli .filterBar {
+    background: rgba(245,242,237,0.97);
+    border-bottom: 1px solid #d0ccc8;
+  }
+
+  /* ── pkgSubtitle::before — hide Loid icon ── */
+  body.doksli .pkgSubtitle::before { display: none; }
+  body.doksli .doneBanner::after { display: none; }
+  body.doksli .headerZone::after { display: none; }
+  body.doksli .options .option.correct::after,
+  body.doksli .options .option.wrong::after { display: none; }
+
+  /* ── qCard: left stamp border ── */
+  body.doksli .qCard {
+    border-left: 4px solid #c0392b;
+  }
+  body.doksli .qCard:hover { box-shadow: 3px 3px 0 rgba(0,0,0,0.1); transform: none; }
+  body.doksli .qCard::before { display: none; }
+
+  /* ── volumeSlider ── */
+  body.doksli .volumeSlider::-webkit-slider-thumb {
+    background: #c0392b;
+    border-radius: 2px;
+    border: 2px solid #fff;
+  }
+
+  /* ── pillBtn.active no animation ── */
+  body.doksli .pillBtn.active { animation: none; }
+  body.doksli .categoryGroup::before { display: none; }
+
+
+  /* ── Doksli sticker attached to correct/wrong option ── */
+  body.doksli .option, body.koceng .option, body.capy .option { position: relative; overflow: visible; }
+  .doksli-sticker {
+    position: absolute;
+    width: 72px; height: 72px;
+    object-fit: contain;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.28), 0 0 0 2.5px #fff;
+    pointer-events: none;
+    z-index: 10;
+    transition: opacity 0.25s ease;
+    right: -12px;
+  }
+  .doksli-sticker[data-corner="tr"] { top: -20px; }
+  .doksli-sticker[data-corner="br"] { bottom: -20px; }
+
+  /* ── Doksli: letter replaced by meme img ── */
+  body.doksli .letter, body.koceng .letter, body.capy .letter { 
+    padding: 0 !important; 
+    background: transparent !important;
+    border: none !important;
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  body.doksli .doksli-letter-img, body.koceng .doksli-letter-img, body.capy .doksli-letter-img {
+    width: 38px; height: 38px;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 0 0 2px #fff, 0 2px 6px rgba(0,0,0,0.25);
+    display: block;
+  }
+  body.doksli .letter.correct .doksli-letter-img, body.koceng .letter.correct .doksli-letter-img, body.capy .letter.correct .doksli-letter-img {
+    box-shadow: 0 0 0 2.5px #27ae60, 0 2px 8px rgba(39,174,96,0.4);
+  }
+  body.doksli .letter.wrong .doksli-letter-img, body.koceng .letter.wrong .doksli-letter-img, body.capy .letter.wrong .doksli-letter-img {
+    box-shadow: 0 0 0 2.5px #c0392b, 0 2px 8px rgba(192,57,43,0.4);
+  }
+
+  /* ── Ensure options don't clip sticker ── */
+  body.doksli .options, body.koceng .options, body.capy .options { overflow: visible; }
+  body.doksli .options .option, body.koceng .options .option, body.capy .options .option { overflow: visible; }
