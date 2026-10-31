@@ -95,6 +95,12 @@ function renderIsianCard(q, qNum, answeredValue) {
   `;
 }
 
+// Gambar opsi (thumbnail berukuran wajar) + tombol 🔍. Tombol ini <span>, bukan <button>,
+// karena letaknya di dalam <button class="option">. Klik-nya ditangkap js/img-zoom.js.
+function optionImageHtml(src) {
+  return `<span class="optImgWrap"><img class="optImg" src="${escapeAttr(src)}" alt="gambar opsi" loading="lazy"><span class="optZoom" data-zoom-src="${escapeAttr(src)}" title="Perbesar" aria-label="Perbesar gambar"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15.6 15.6 20.5 20.5" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg></span></span>`;
+}
+
 // ── Render: kartu soal (dipakai di semua mode) ────────────────────────────
 function renderQuestionCard(q, qNum, chosen, revealAnswer) {
   const isAnswered = chosen !== undefined && chosen !== null;
@@ -106,6 +112,8 @@ function renderQuestionCard(q, qNum, chosen, revealAnswer) {
     let letterCls = "letter";
     let icon = "";
     const locked = isAnswered ? " locked" : "";
+    const imgSrc = (q.optionImages || {})[letter];
+    if (imgSrc) cls += " hasImg";
 
     if (!showState) {
       if (chosen === letter) cls += " selected";
@@ -133,7 +141,8 @@ function renderQuestionCard(q, qNum, chosen, revealAnswer) {
       <button class="${cls}${locked}" data-qid="${escapeAttr(q.id)}" data-letter="${escapeAttr(letter)}">
         <span class="${letterCls}" data-letter="${letter}">${(window._dkOn() && window._dkImg) ? `<img class="doksli-letter-img" src="${window._dkImg()}" aria-hidden="true">` : letter}</span>
         <span class="optBody">
-          <span class="optText">${escapeHtml(text)}</span>
+          ${imgSrc ? optionImageHtml(imgSrc) : ""}
+          ${text ? `<span class="optText">${escapeHtml(text)}</span>` : ""}
           ${expHtml}
         </span>
         ${icon}

@@ -92,6 +92,7 @@ async function mpCreateRoom() {
     publicQs[i] = {
       question: q.question || "",
       options: q.options || {},
+      optionImages: q.optionImages || {},
       questionImages: (q.questionImages || []).filter((s) => typeof s === "string"),
     };
   });

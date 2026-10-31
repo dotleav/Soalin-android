@@ -139,7 +139,8 @@ function prepareCustomQs(rec) {
   const urls = rec.blobs.map((b) => b && URL.createObjectURL(b));
   customUrls = urls;
   const pick = (idxs) => idxs.map((i) => urls[i]);
-  return rec.questions.map((q) => ({ ...q, questionImages: pick(q.questionImages), explanationImages: pick(q.explanationImages) }));
+  const pickOpt = (o) => (o ? Object.fromEntries(Object.entries(o).map(([L, i]) => [L, urls[i]])) : undefined);
+  return rec.questions.map((q) => ({ ...q, questionImages: pick(q.questionImages), explanationImages: pick(q.explanationImages), optionImages: pickOpt(q.optionImages) }));
 }
 
 // Muat semua kuis custom dari IndexedDB. Kunci "custom" (format lama, 1 kuis) ikut dibaca.

@@ -159,6 +159,24 @@ async function convertDocx(buf) {
     .map((s, i) => ({ text: s.text.trim(), images: s.imgs.filter((k) => blobs[k]), isHeading: b.heading, isListItem: b.ordered && i === 0 }))
     .filter((l) => (l.text || l.images.length) && !/^Sumber\s*:/i.test(l.text)); // baris "Sumber:" (rujukan hal. PPT) diabaikan
 
+  // ── Tabel opsi gambar (5 kolom A–E): baris 1 = huruf, baris 2 = gambar tiap opsi, baris 3 = {penjelasan} ──
+  const OPT_LETTERS = ["A", "B", "C", "D", "E"];
+  const cellText = (cell) => cell.flatMap((b) => (b.segs ? b.segs.map((s) => s.text) : [])).join(" ").replace(/\s+/g, " ").trim();
+  const cellImg = (cell) => cell.flatMap((b) => (b.segs ? b.segs.flatMap((s) => s.imgs) : [])).find((k) => blobs[k] !== undefined);
+  const isOptTbl = (rows) => !!rows[0] && rows[0].length === OPT_LETTERS.length &&
+    rows[0].every((c, i) => cellText(c).replace(/[.)]$/, "").toUpperCase() === OPT_LETTERS[i]);
+  const optTableOf = (rows) => Object.fromEntries(OPT_LETTERS.map((L, i) => {
+    const pic = (rows[1] || [])[i] || [], exp = (rows[2] || [])[i] || [];
+    const body = parseOptionBody(cellText(exp));
+    return [L, { text: cellText(pic), image: cellImg(pic), exp: body.exp || body.text }];
+  }));
+  // Tabel opsi jadi satu baris khusus { optTable } untuk parser Bagian 1.
+  const lineOf = (bl) => bl.flatMap((b) => {
+    if (!b.tbl) return paraLines(b);
+    if (isOptTbl(b.tbl)) return [{ text: "", images: [], isHeading: false, isListItem: false, optTable: optTableOf(b.tbl) }];
+    return b.tbl.flat().flatMap(lineOf);
+  });
+
   // Bagian 2 = mulai dari heading "Bagian 2"/"Gagal Diperbaiki" terakhir; tanpa heading itu, mulai dari tabel pertama.
   // Bagian 3 = mulai dari heading "Bagian 3"/"Soal Isian" terakhir (kalau ada).
   let cut = -1, cut3 = -1;
@@ -172,7 +190,7 @@ async function convertDocx(buf) {
     // Tanpa heading Bagian 2: tabel pertama = Bagian 2 — tapi jangan lewati
     // heading Bagian 3 kalau sudah ketemu, atau tabel isian ikut kesedot ke sini.
     const searchEnd = cut3 >= 0 ? cut3 : blocks.length;
-    cut = blocks.findIndex((b, i) => b.tbl && i < searchEnd);
+    cut = blocks.findIndex((b, i) => b.tbl && !isOptTbl(b.tbl) && i < searchEnd);
   }
   const part1 = cut < 0 ? blocks : blocks.slice(0, cut);
   const part2 = cut < 0 ? [] : blocks.slice(cut, cut3 < 0 ? blocks.length : cut3);
@@ -225,6 +243,22 @@ async function convertDocx(buf) {
       mode = inline ? "answer" : "question";
     };
     for (const rawLine of lines) {
+      if (rawLine.optTable) { // tabel opsi gambar: isi A–E sekaligus
+        pendingOpt = null;
+        if (current) {
+          for (const L of OPT_LETTERS) {
+            const o = rawLine.optTable[L];
+            current.options[L] = o.text;
+            if (o.image !== undefined) {
+              current.optionImages = current.optionImages || {};
+              current.optionImages[L] = o.image;
+            }
+            if (o.exp) current.optionExplanations[L] = o.exp;
+          }
+          mode = "options";
+        }
+        continue;
+      }
       const hl = rawLine.text.startsWith(HL_MARK); // baris ini di-highlight (penanda kunci)
       const { images, isHeading, isListItem } = rawLine;
       const text = hl ? rawLine.text.slice(HL_MARK.length).trimStart() : rawLine.text;
@@ -326,8 +360,8 @@ async function convertDocx(buf) {
     return isian;
   }
 
-  const normal = parsePart1(flat(part1).flatMap(paraLines));
-  const rusak = parsePart2(part2.filter((b) => b.tbl).map((b) => b.tbl), normal.length);
-  const isian = parsePart3(part3.filter((b) => b.tbl).map((b) => b.tbl), normal.length + rusak.length);
+  const normal = parsePart1(lineOf(part1));
+  const rusak = parsePart2(part2.filter((b) => b.tbl && !isOptTbl(b.tbl)).map((b) => b.tbl), normal.length);
+  const isian = parsePart3(part3.filter((b) => b.tbl && !isOptTbl(b.tbl)).map((b) => b.tbl), normal.length + rusak.length);
   return { questions: [...normal, ...rusak, ...isian], blobs, stats: { normal: normal.length, rusak: rusak.length, isian: isian.length, images: blobs.filter(Boolean).length, skippedExt: [...skippedExt] } };
 }

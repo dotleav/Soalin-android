@@ -158,7 +158,7 @@ function renderMpPlaying() {
       <button class="${cls.join(" ")}" data-mp-act="answer" data-letter="${l}" ${disabled ? "disabled" : ""}>
         ${mpIsHost ? `<span class="mpBar" style="width:${pct}%"></span>` : ""}
         <span class="letter">${l}</span>
-        <span class="optText">${escapeHtml(q.options[l])}</span>
+        <span class="optBody">${q.optionImages?.[l] ? optionImageHtml(q.optionImages[l]) : ""}${q.options[l] ? `<span class="optText">${escapeHtml(q.options[l])}</span>` : ""}</span>
         ${mpIsHost ? `<span class="mpCount mono">${pickCount[l] || 0}</span>` : ""}
       </button>`;
   }).join("");
