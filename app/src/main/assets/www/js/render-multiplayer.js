@@ -1,3 +1,6 @@
+let mpReviewIdx = null;       // pemain: soal lama yang sedang ditinjau (null = tidak)
+let mpReviewListOpen = false;  // pemain: daftar soal sebelumnya terbuka
+let mpReviewCur = "";          // kunci room+soal saat daftar terakhir dibuka (reset kalau pindah)
 // ── Render: layar Multiplayer (join kode → username → room) ───────────────
 function mpErrorHtml() {
   return mpError ? `<div class="mpError">${escapeHtml(mpError)}</div>` : "";
@@ -25,27 +28,37 @@ function renderMultiplayerScreen() {
 }
 
 function renderMpJoin() {
-  const chips = Object.keys(DIFFICULTY_CONFIG).map((k) => {
+  const cards = Object.keys(DIFFICULTY_CONFIG).map((k) => {
     const c = DIFFICULTY_CONFIG[k];
     const on = mpDiff === k;
-    return `<button class="mpChip${on ? " on" : ""}" data-mp-act="pickdiff" data-diff="${k}" style="${on ? `border-color:${c.color}` : ""}">${escapeHtml(c.label)} · ${c.timerSeconds ? c.timerSeconds + " dtk" : "manual"}</button>`;
+    const timer = c.timerSeconds === 0 ? "\u221E" : `${c.timerSeconds}s`;
+    return `
+      <button class="mpDiffCard${on ? " on" : ""}" data-mp-act="pickdiff" data-diff="${k}" style="--dc:${c.color};">
+        <span class="mpDiffEmoji">${c.emoji || ""}</span>
+        <span class="mpDiffLabel">${escapeHtml(c.label)}</span>
+        <span class="mpDiffTimer mono">${timer} / soal</span>
+        <span class="mpDiffDesc">${escapeHtml(c.desc || "")}</span>
+      </button>`;
   }).join("");
+  const dcfg = DIFFICULTY_CONFIG[mpDiff] || DIFFICULTY_CONFIG.bekicot;
   return `
     <main class="wrap">
-      <div class="mpCard">
+      <div class="mpCard mpSetup">
         <button class="mpLinkBtn" data-mp-act="back">\u2190 Kembali</button>
         <h1 class="mpTitle">\uD83C\uDFAE Multiplayer</h1>
         <p class="mpSub">Masukkan kode room dari host.</p>
-        <input id="mpCodeInput" class="mpInput mono" maxlength="4" placeholder="KODE" autocomplete="off" autocapitalize="characters" value="${escapeAttr(mpPendingCode)}">
-        ${mpErrorHtml()}
-        <button class="mpPrimary" data-mp-act="verify" ${mpBusy ? "disabled" : ""}>${mpBusy ? "Mengecek\u2026" : "Lanjut"}</button>
-        <div class="mpDivider"></div>
-        <p class="mpSub">Kamu host? Pilih tingkat kesulitan:</p>
-        <div class="mpPlayers">${chips}</div>
-        <div class="mpPlayers">
-          <button class="mpChip${mpShuffle ? " on" : ""}" data-mp-act="toggleshuffle">\uD83D\uDD00 Acak urutan soal: ${mpShuffle ? "ya" : "tidak"}</button>
+        <div class="mpJoinRow">
+          <input id="mpCodeInput" class="mpInput mono" maxlength="4" placeholder="KODE" autocomplete="off" autocapitalize="characters" value="${escapeAttr(mpPendingCode)}">
+          <button class="mpPrimary mpJoinBtn" data-mp-act="verify" ${mpBusy ? "disabled" : ""}>${mpBusy ? "Mengecek\u2026" : "Lanjut"}</button>
         </div>
-        <button class="mpSecondary" data-mp-act="create" ${mpBusy ? "disabled" : ""}>Buat room baru</button>
+        ${mpErrorHtml()}
+        <div class="mpDivider"></div>
+        <div class="sectionLabel">Jadi host? Pilih mode</div>
+        <div class="mpDiffGrid">${cards}</div>
+        <button class="mpShuffleRow${mpShuffle ? " on" : ""}" data-mp-act="toggleshuffle">
+          <span>\uD83D\uDD00 Acak urutan soal</span><span class="mpSwitch${mpShuffle ? " on" : ""}"></span>
+        </button>
+        <button class="mpCreateBtn" data-mp-act="create" style="background:${dcfg.color};" ${mpBusy ? "disabled" : ""}>\u25B6 Buat room \u00B7 ${escapeHtml(dcfg.label)}</button>
       </div>
     </main>`;
 }
@@ -92,7 +105,7 @@ function renderMpRoom() {
   let body = "";
   if (phase === "lobby") body = renderMpLobby();
   else if (phase === "ended") body = renderMpEnded();
-  else body = renderMpPlaying();
+  else body = renderMpPlaying() + mpReviewBarHtml();
 
   const footer = mpIsHost
     ? `<button class="mpDanger" data-mp-act="close">Tutup room</button>`
@@ -125,6 +138,9 @@ function renderMpLobby() {
 function renderMpPlaying() {
   const st = mpRoom.state;
   const i = st.currentIdx;
+  const rvKey = mpRoomCode + ":" + i;
+  if (mpReviewCur !== rvKey) { mpReviewCur = rvKey; mpReviewIdx = null; mpReviewListOpen = false; }
+  if (mpReviewIdx !== null) return mpReviewViewerHtml(mpReviewIdx);
   const q = mpRoom.questions[i];
   if (!q) return `<p class="mpSub">Memuat soal\u2026</p>`;
 
@@ -224,8 +240,76 @@ function attachMultiplayerHandlers() {
   app.querySelectorAll("[data-mp-act]").forEach((el) => {
     el.addEventListener("click", () => mpAct(el.dataset.mpAct, el));
   });
+  app.querySelectorAll("[data-mp-rv]").forEach((el) => {
+    el.addEventListener("click", () => mpReviewAct(el.dataset.mpRv, el));
+  });
   const codeInput = document.getElementById("mpCodeInput");
   if (codeInput) codeInput.addEventListener("keydown", (e) => { if (e.key === "Enter") mpAct("verify"); });
   const nameInput = document.getElementById("mpNameInput");
   if (nameInput) nameInput.addEventListener("keydown", (e) => { if (e.key === "Enter") mpAct("enter"); });
 }
+
+// ── Multiplayer: tinjau soal sebelumnya ───────────────────────────────────
+// Aturan sama seperti Mode Tentamen: mode dengan timer → baru bisa setelah
+// jawab soal yang sedang berjalan (atau waktu habis). Mode tanpa timer → kapan saja.
+// Hanya pemain yang melihat daftar ini (host tidak menjawab).
+function mpSolvedBefore(i) {
+  const out = [];
+  for (let j = 0; j < i; j++) {
+    if (mpRoom.reveal?.[j] && mpMyAnswers[j] !== undefined) out.push(j);
+  }
+  return out;
+}
+function mpReviewAllowed(i) {
+  const timed = mpRemaining() !== null;
+  if (!timed) return true;
+  const timedOut = mpRemaining() === 0;
+  return mpMyAnswers[i] !== undefined || timedOut;
+}
+function mpReviewBarHtml() {
+  if (mpReviewIdx !== null || mpIsHost || !mpRoom.state || mpRoom.state.phase !== "playing") return "";
+  const i = mpRoom.state.currentIdx;
+  if (!mpReviewAllowed(i)) return "";
+  const solved = mpSolvedBefore(i);
+  if (!solved.length) return "";
+  let html = `<div class="trvBar"><button class="trvToggle${mpReviewListOpen ? " open" : ""}" data-mp-rv="toggle" aria-expanded="${mpReviewListOpen}">\uD83D\uDCCB Soal sebelumnya <span class="mono">(${solved.length})</span></button></div>`;
+  if (mpReviewListOpen) {
+    html += `<div class="trvList">`;
+    for (const j of solved) {
+      const ok = mpMyAnswers[j] === mpRoom.reveal[j].answer;
+      const snippet = String(mpRoom.questions[j]?.question || "").replace(/\s+/g, " ").slice(0, 80);
+      html += `<button class="trvItem ${ok ? "ok" : "bad"}" data-mp-rv="open" data-idx="${j}"><span class="trvNum mono">${j + 1}</span><span class="trvText">${escapeHtml(snippet)}</span><span class="trvChip">${ok ? "\u2713 Benar" : "\u2717 Salah"}</span></button>`;
+    }
+    html += `</div>`;
+  }
+  return html;
+}
+function mpReviewViewerHtml(j) {
+  const q = mpRoom.questions[j];
+  const rev = mpRoom.reveal?.[j];
+  const my = mpMyAnswers[j];
+  if (!q || !rev) return `<p class="mpSub">Soal tidak tersedia.</p><button class="mpPrimary trvResume" data-mp-rv="resume">\u21A9 Lanjutkan</button>`;
+  const ok = my === rev.answer;
+  const opts = Object.keys(q.options || {}).sort().map((l) => {
+    const cls = ["option", "mpOpt", "mpRvOpt"];
+    if (l === rev.answer) cls.push("correct");
+    else if (l === my) cls.push("wrong");
+    if (my === l) cls.push("selected");
+    return `<div class="${cls.join(" ")}"><span class="letter">${l}</span><span class="optBody">${q.optionImages?.[l] ? optionImageHtml(q.optionImages[l]) : ""}${q.options[l] ? `<span class="optText">${escapeHtml(q.options[l])}</span>` : ""}</span></div>`;
+  }).join("");
+  const qImgs = (q.questionImages || []).map((src) => `<img class="qImg" src="${escapeAttr(src)}" alt="gambar soal">`).join("");
+  const status = my === undefined ? "tidak dijawab" : ok ? "jawabanmu benar" : "jawabanmu salah";
+  return `
+    <div class="trvBanner ${ok ? "ok" : "bad"}">Meninjau soal ${j + 1} \u00B7 ${status} \u00B7 kunci: ${escapeHtml(String(rev.answer))}</div>
+    <div class="mpRvQ">${escapeHtml(q.question || "")}</div>
+    ${qImgs}
+    <div class="mpRvOpts">${opts}</div>
+    <button class="mpPrimary trvResume" data-mp-rv="resume">\u21A9 Lanjutkan</button>`;
+}
+function mpReviewAct(act, el) {
+  if (act === "toggle") mpReviewListOpen = !mpReviewListOpen;
+  else if (act === "open") { mpReviewIdx = Number(el.dataset.idx); mpReviewListOpen = false; }
+  else if (act === "resume") mpReviewIdx = null;
+  render();
+}
+

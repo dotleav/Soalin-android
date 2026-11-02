@@ -112,18 +112,7 @@ function playSwordFlash(x, y, delayMs) {
 }
 
 function playSound(correct) {
-  if (!isMuted) {
-    const pool = correct ? benarPool : salahPool;
-    const lastIdx = correct ? lastBenarIdx : lastSalahIdx;
-    const idx = pickRandomIndex(pool.length, lastIdx);
-    if (correct) lastBenarIdx = idx; else lastSalahIdx = idx;
-    const chosen = pool[idx];
-    try {
-      chosen.pause(); chosen.currentTime = 0;
-      currentAudio = chosen;
-      chosen.play().catch(() => {});
-    } catch { /* noop */ }
-  }
+  if (!isMuted) answertonePlay(correct); // pilihan suara ada di js/answertone.js
   // ── SxF Mode: character reaction ──
   if (theme === "sxf") {
     const sxfNotifEl = document.getElementById("sxfNotif");
@@ -199,7 +188,7 @@ function toggleMute() {
 }
 function setVolume(v) {
   volume = Math.min(1, Math.max(0, v));
-  [...benarPool, ...salahPool].forEach((a) => { a.volume = volume; });
+  soundCatalog.forEach((s) => { s.audio.volume = volume; });
   try { localStorage.setItem(VOLUME_KEY, String(volume)); } catch { /* noop */ }
 }
 

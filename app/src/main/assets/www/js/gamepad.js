@@ -58,7 +58,7 @@
     if (hit(pad, 8, now, false)) click("#pkgSwitchBtn");
     if (hit(pad, 3, now, false)) click("#shuffleBtn");
     if (hit(pad, 2, now, false)) click("#resetBtn");
-    if (hit(pad, 9, now, false)) click("#nextTentamenBtn, #startTentamenBtn, #loadMoreBtn, #restartTentamenBtn");
+    if (hit(pad, 9, now, false)) click("#nextTentamenBtn, #tentamenResumeBtn, #startTentamenBtn, #loadMoreBtn, #restartTentamenBtn");
 
     requestAnimationFrame(loop);
   }

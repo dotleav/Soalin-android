@@ -66,6 +66,8 @@ let tentamenAdvanceHandle = null;
 // diklik. Ini akar dari "blink" tiap jawab: seluruh kartu soal fade-in
 // ulang padahal soalnya sama, cuma status jawabannya yang berubah.
 let tentamenFadeKey = null;
+let tentamenReviewIdx = null;        // soal yang sedang ditinjau (null = soal berjalan)
+let tentamenReviewListOpen = false;  // daftar soal sebelumnya terbuka/tidak
 
 // ── Paket soal / kategori: manifest, load, switch ─────────────────────────
 async function loadManifest() {

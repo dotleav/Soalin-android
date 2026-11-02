@@ -63,6 +63,7 @@ function renderSettingsCard() {
         <span class="volumeIcon">\uD83D\uDD0A</span>
         <span class="volumeVal mono" id="volumeVal">${volPct}%</span>
       </div>
+      ${renderAnswertoneCard()}
     </div>
   `;
 }
@@ -177,6 +178,7 @@ function attachPickerHandlers() {
   });
   const closeBtn = document.getElementById("pickerCloseBtn");
   if (closeBtn) closeBtn.addEventListener("click", () => { pickerOpen = false; render(); });
+  attachAnswertoneHandlers();
 
   const docxInput = document.getElementById("docxInput");
   docxInput.addEventListener("change", (e) => handleDocx(e.target.files));

@@ -90,15 +90,26 @@ function renderTentamenRunning() {
     <div class="timerTrack"><div class="timerFill" id="timerFill" style="background:${isUrgent ? "var(--wrong-strong)" : cfg.color}; width:${tentamenDifficulty === "bekicot" ? 100 : isAnswering ? timerPct : isTimeout ? 0 : 100}%;"></div></div>
   </div>`;
 
-  html += q.isIsian
-    ? renderIsianCard(q, qNum, tentamenAnswers[currentIdx])
-    : renderQuestionCard(q, qNum, tentamenAnswers[currentIdx], qPhase !== "answering");
+  const viewing = tentamenReviewViewerIdx();
+  if (viewing !== null) {
+    html += tentamenReviewViewerHtml(viewing);
+  } else {
+    html += q.isIsian
+      ? renderIsianCard(q, qNum, tentamenAnswers[currentIdx])
+      : renderQuestionCard(q, qNum, tentamenAnswers[currentIdx], qPhase !== "answering");
+  }
 
   if (isTimeout) {
     html += `<div class="timeoutNotice">\u26A0\uFE0F <span>Waktu habis! Soal ini dihitung terlewati. Melanjutkan\u2026</span></div>`;
   }
 
-  if (isManual) {
+  if (viewing !== null) {
+    html += `<button class="nextBtn trvResume" id="tentamenResumeBtn">\u21A9 Lanjutkan Kuis</button>`;
+  } else {
+    html += tentamenReviewBarHtml();
+  }
+
+  if (isManual && viewing === null) {
     html += `<button class="nextBtn" id="nextTentamenBtn">${qNum < total ? "\u2794 Soal Berikutnya" : "\uD83C\uDFC6 Lihat Hasil"}</button>`;
   }
 
@@ -168,5 +179,58 @@ function renderTentamenResults() {
   html += `</div>`;
 
   html += `</div>`;
+  return html;
+}
+
+// ── Tinjau soal sebelumnya (Mode Tentamen) ────────────────────────────────
+// Mode dengan timer: daftar baru muncul setelah soal yang sedang berjalan sudah dijawab.
+// Mode Bekicot (tanpa timer): bisa dibuka kapan saja, tanpa batas.
+function tentamenSolvedBefore() {
+  const out = [];
+  for (let i = 0; i < currentIdx; i++) {
+    const a = tentamenAnswers[i];
+    if (typeof a === "string" && a !== "skipped") out.push(i);
+  }
+  return out;
+}
+function tentamenIsCorrect(i) {
+  const q = tentamenQuestions[i];
+  const a = tentamenAnswers[i];
+  if (!q || typeof a !== "string" || a === "skipped") return false;
+  return q.isIsian ? true : a === q.answer;
+}
+function tentamenReviewAllowed() {
+  if (tentamenState !== "running") return false;
+  return tentamenDifficulty === "bekicot" || qPhase === "answered_manual";
+}
+// Indeks soal yang sedang ditinjau, atau null kalau kembali ke soal berjalan.
+function tentamenReviewViewerIdx() {
+  if (tentamenReviewIdx === null || tentamenReviewIdx === undefined) return null;
+  const ok = tentamenReviewIdx >= 0 && tentamenReviewIdx < currentIdx && typeof tentamenAnswers[tentamenReviewIdx] === "string";
+  return ok ? tentamenReviewIdx : null;
+}
+function tentamenReviewBarHtml() {
+  if (!tentamenReviewAllowed()) return "";
+  const solved = tentamenSolvedBefore();
+  if (!solved.length) return "";
+  let html = `<div class="trvBar"><button class="trvToggle${tentamenReviewListOpen ? " open" : ""}" id="tentamenReviewToggle" aria-expanded="${tentamenReviewListOpen}">\uD83D\uDCCB Soal sebelumnya <span class="mono">(${solved.length})</span></button></div>`;
+  if (tentamenReviewListOpen) {
+    html += `<div class="trvList">`;
+    for (const i of solved) {
+      const q = tentamenQuestions[i];
+      const ok = tentamenIsCorrect(i);
+      const snippet = String(q.question || "").replace(/\s+/g, " ").slice(0, 80);
+      html += `<button class="trvItem ${ok ? "ok" : "bad"}" data-review-idx="${i}"><span class="trvNum mono">${i + 1}</span><span class="trvText">${escapeHtml(snippet)}</span><span class="trvChip">${ok ? "\u2713 Benar" : "\u2717 Salah"}</span></button>`;
+    }
+    html += `</div>`;
+  }
+  return html;
+}
+function tentamenReviewViewerHtml(i) {
+  const q = tentamenQuestions[i];
+  const a = tentamenAnswers[i];
+  const ok = tentamenIsCorrect(i);
+  let html = `<div class="trvBanner ${ok ? "ok" : "bad"}">Meninjau soal ${i + 1} \u00B7 ${ok ? "dijawab benar" : "dijawab salah"}</div>`;
+  html += q.isIsian ? renderIsianCard(q, i + 1, a) : renderQuestionCard(q, i + 1, a, true);
   return html;
 }

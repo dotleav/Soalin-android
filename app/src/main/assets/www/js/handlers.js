@@ -55,6 +55,8 @@ function handleAnswerIsian(qId, text) {
 
 // ── Mode Tentamen: handlers ──────────────────────────────────────────────
 function stopTentamenTimerLoop() {
+  tentamenReviewIdx = null;
+  tentamenReviewListOpen = false;
   if (tentamenTimerHandle) { clearInterval(tentamenTimerHandle); tentamenTimerHandle = null; }
   if (tentamenAdvanceHandle) { clearTimeout(tentamenAdvanceHandle); tentamenAdvanceHandle = null; }
 }
@@ -122,6 +124,7 @@ function handleResetTentamen() {
   render();
 }
 function handleAnswerTentamen(letter) {
+  if (tentamenReviewIdx !== null) return; // sedang meninjau soal lama: jawaban soal berjalan tidak boleh berubah
   if (tentamenAnswers[currentIdx] !== null && tentamenAnswers[currentIdx] !== undefined) return;
   const q = tentamenQuestions[currentIdx];
   tentamenAnswers[currentIdx] = letter;
@@ -132,6 +135,7 @@ function handleAnswerTentamen(letter) {
 // Soal isian di Tentamen — sama seperti Mode Latihan: dinilai self-graded,
 // jawaban apa pun yang terisi dihitung benar begitu dikirim (lihat renderTentamenResults).
 function handleAnswerTentamenIsian(text) {
+  if (tentamenReviewIdx !== null) return;
   if (tentamenAnswers[currentIdx] !== null && tentamenAnswers[currentIdx] !== undefined) return;
   const trimmed = (text || "").trim();
   if (!trimmed) return;
@@ -141,6 +145,8 @@ function handleAnswerTentamenIsian(text) {
   render();
 }
 function advanceOrFinish() {
+  tentamenReviewIdx = null;
+  tentamenReviewListOpen = false;
   if (tentamenAdvanceHandle) { clearTimeout(tentamenAdvanceHandle); tentamenAdvanceHandle = null; }
   if (currentIdx >= tentamenQuestions.length - 1) {
     tentamenState = "finished";
@@ -197,4 +203,19 @@ window.addEventListener("beforeunload", (e) => {
     e.preventDefault();
     e.returnValue = "";
   }
+});
+
+// ── Tentamen: tinjau soal sebelumnya (delegasi klik) ─────────────────────
+document.addEventListener("click", (e) => {
+  const t = e.target.closest ? e.target.closest("#tentamenReviewToggle, #tentamenResumeBtn, [data-review-idx]") : null;
+  if (!t || quizMode !== "tentamen" || tentamenState !== "running") return;
+  if (t.id === "tentamenReviewToggle") {
+    tentamenReviewListOpen = !tentamenReviewListOpen;
+  } else if (t.id === "tentamenResumeBtn") {
+    tentamenReviewIdx = null;
+  } else {
+    tentamenReviewIdx = Number(t.dataset.reviewIdx);
+    tentamenReviewListOpen = false;
+  }
+  render();
 });

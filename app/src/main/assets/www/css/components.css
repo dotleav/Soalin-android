@@ -604,5 +604,82 @@
   }
   .volumeSlider::-moz-range-track { background: var(--border-light); height: 6px; border-radius: 999px; }
 
+  /* ── Answertone (pilih suara jawaban) ── */
+  .atWrap { border-top: 1px solid var(--border-light); margin-top: 6px; padding-top: 2px; }
+  .atHead { border-bottom: none; }
+  .atBody { padding: 4px 0 2px; }
+  .atBulk { display: flex; gap: 6px; flex-wrap: wrap; padding: 6px 0 10px; }
+  .atBulkBtn {
+    padding: 6px 10px; border-radius: var(--radius-sm); border: 1.5px solid var(--border);
+    background: var(--card-soft); color: var(--text-secondary); font-size: 0.74rem; font-weight: 700; cursor: pointer;
+  }
+  .atBulkBtn:hover { border-color: var(--accent); }
+  .atList { max-height: 340px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding-right: 2px; }
+  .atItem {
+    display: grid; grid-template-columns: auto 1fr auto auto auto; align-items: center; gap: 8px;
+    padding: 7px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border-light); background: var(--card-soft);
+  }
+  .atItem.off { opacity: 0.55; }
+  .atCheck { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; margin: 0; }
+  .atName { display: flex; flex-direction: column; min-width: 0; }
+  .atTitle { font-size: 0.8rem; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .atTag { font-size: 0.66rem; color: var(--muted2); }
+  .atTrigger {
+    font-size: 0.72rem; padding: 4px 6px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+    background: var(--card); color: var(--text); cursor: pointer;
+  }
+  .atBtn {
+    width: 28px; height: 28px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+    background: var(--card); color: var(--text-secondary); cursor: pointer; font-size: 0.7rem; padding: 0;
+  }
+  .atBtn:hover { border-color: var(--accent); }
+  .atDel:hover { color: var(--wrong-strong); border-color: var(--wrong-strong); }
+  .atEmpty, .atHint { font-size: 0.74rem; color: var(--muted2); padding: 8px 0; }
+
+  /* ── Tentamen: tinjau soal sebelumnya ── */
+  .trvBar { display: flex; justify-content: flex-end; margin: 10px 0 6px; }
+  .trvToggle { padding: 7px 12px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: var(--card-soft); color: var(--text-secondary); font-size: 0.78rem; font-weight: 700; cursor: pointer; }
+  .trvToggle:hover, .trvToggle.open { border-color: var(--accent); color: var(--text); }
+  .trvList { display: flex; flex-direction: column; gap: 6px; margin: 4px 0 10px; max-height: 300px; overflow-y: auto; }
+  .trvItem { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 9px 10px; border-radius: var(--radius-sm); border: 1.5px solid var(--border-light); border-left-width: 4px; background: var(--card); color: var(--text); cursor: pointer; font-size: 0.8rem; }
+  .trvItem.ok { border-left-color: var(--correct); }
+  .trvItem.bad { border-left-color: var(--wrong); }
+  .trvItem:hover { border-color: var(--accent); }
+  .trvNum { color: var(--muted2); min-width: 22px; }
+  .trvText { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .trvChip { font-size: 0.7rem; font-weight: 700; white-space: nowrap; }
+  .trvItem.ok .trvChip { color: var(--correct); }
+  .trvItem.bad .trvChip { color: var(--wrong); }
+  .trvBanner { font-size: 0.78rem; font-weight: 700; padding: 8px 12px; border-radius: var(--radius-sm); margin-bottom: 8px; border: 1px solid var(--border-light); }
+  .trvBanner.ok { color: var(--correct); }
+  .trvBanner.bad { color: var(--wrong); }
+  .trvResume { margin-top: 10px; }
+
+  /* ── Multiplayer: setup seperti tentamen ── */
+  .mpSetup { display: flex; flex-direction: column; gap: 10px; }
+  .mpJoinRow { display: flex; gap: 8px; }
+  .mpJoinRow .mpInput { flex: 1; }
+  .mpJoinBtn { width: auto; padding: 0 18px; }
+  .mpDiffGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .mpDiffCard { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; padding: 12px; border-radius: 14px; border: 2px solid var(--border); background: var(--card-soft); color: var(--text); text-align: left; cursor: pointer; transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s; }
+  .mpDiffCard:hover { transform: translateY(-2px); }
+  .mpDiffCard.on { border-color: var(--dc); box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.14); }
+  .mpDiffEmoji { font-size: 1.5rem; line-height: 1; }
+  .mpDiffLabel { font-weight: 800; font-size: 0.9rem; }
+  .mpDiffTimer { font-size: 0.7rem; color: var(--dc); font-weight: 700; }
+  .mpDiffDesc { font-size: 0.68rem; color: var(--muted2); }
+  .mpShuffleRow { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--card-soft); color: var(--text); cursor: pointer; font-weight: 600; font-size: 0.82rem; }
+  .mpSwitch { width: 38px; height: 22px; border-radius: 999px; background: var(--border); position: relative; transition: background 0.2s; }
+  .mpSwitch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform 0.2s; }
+  .mpSwitch.on { background: var(--accent); }
+  .mpSwitch.on::after { transform: translateX(16px); }
+  .mpCreateBtn { width: 100%; padding: 14px; border: none; border-radius: 14px; color: #fff; font-weight: 800; font-size: 0.95rem; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25); }
+  .mpCreateBtn:disabled { opacity: 0.6; cursor: default; }
+  .mpRvQ { font-size: 0.95rem; font-weight: 600; margin: 6px 0 10px; color: var(--text); }
+  .mpRvOpts { display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px; }
+  .mpRvOpt { cursor: default; }
+  .mpRvOpt.correct { border-color: var(--correct); }
+  .mpRvOpt.wrong { border-color: var(--wrong); }
+
   /* ── Gamepad: ring fokus ── */
   #app .padFocus { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 8px; }

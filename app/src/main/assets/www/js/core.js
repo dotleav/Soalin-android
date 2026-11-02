@@ -47,38 +47,18 @@ function escapeHtml(str) {
 function escapeAttr(str) { return escapeHtml(str); }
 
 // ── Audio (benar/salah) ──────────────────────────────────────────────────
-// File suara "benar" tinggal ditaruh di folder audio/benar/, dan file
-// suara "salah" di audio/salah/ — nama file BEBAS (ga perlu diawali
-// "benar"/"salah" atau dinomori urut). Daftar isi tiap folder di-generate
-// ke audio/manifest.js lewat:
+// Suara bawaan: taruh file di audio/benar/ dan audio/salah/, lalu jalankan
 //     npm run audio-manifest
-// (jalankan ulang tiap kali nambah/hapus/rename file di audio/benar/ atau
-// audio/salah/). App tinggal baca window.AUDIO_MANIFEST dari file itu.
-//
-// BUG LAMA yang ini gantiin: penemuan file bernomor (benar1.mp3, dst)
-// berhenti begitu ketemu SATU nomor yang bolong (mis. salah3.mp3 ga ada),
-// jadi semua file sesudah nomor yang bolong itu (salah4..salah9) ga
-// pernah ikut kedeteksi/keputer sama sekali. Manifest yang di-generate
-// dari isi folder asli ga punya masalah "bolong nomor" ini.
-// Coba load audio/manifest.js secara dinamis (non-blocking) — kalau 404,
-// pool tetap kosong dan suara hanya tidak bunyi, halaman tidak crash.
-let benarPool = [];
-let salahPool = [];
-function buildAudioPool(folder, fileNames) {
-  return (fileNames || []).map((name) => new Audio(`./audio/${folder}/${name}`));
-}
+// untuk membuat audio/manifest.js. Daftar suara, centang, dan kapan suara
+// keluar (benar / salah / keduanya) ada di js/answertone.js.
+// Kalau manifest.js tidak ada, suara bawaan tidak bunyi, halaman tetap jalan.
 (function loadAudioManifest() {
   try {
     const s = document.createElement("script");
     s.src = "./audio/manifest.js";
-    s.onload = () => {
-      const m = window.AUDIO_MANIFEST || {};
-      benarPool = buildAudioPool("benar", m.benar);
-      salahPool = buildAudioPool("salah", m.salah);
-      [...benarPool, ...salahPool].forEach((a) => { a.volume = volume; });
-    };
+    s.onload = () => answertoneBuildBuiltin(window.AUDIO_MANIFEST || {});
     s.onerror = () => {
-      console.warn("[audio] audio/manifest.js tidak ditemukan — suara benar/salah tidak akan bunyi. Jalankan 'npm run audio-manifest'.");
+      console.warn("[audio] audio/manifest.js tidak ditemukan — suara bawaan tidak akan bunyi. Jalankan 'npm run audio-manifest'.");
     };
     document.head.appendChild(s);
   } catch {
@@ -94,23 +74,6 @@ try {
   const rawVol = parseFloat(localStorage.getItem(VOLUME_KEY));
   if (!Number.isNaN(rawVol)) volume = Math.min(1, Math.max(0, rawVol));
 } catch { /* noop */ }
-[...benarPool, ...salahPool].forEach((a) => { a.volume = volume; });
 
 // Audio yang lagi/baru saja diputar — dipakai buat berhentiin paksa pas mute ditekan.
 let currentAudio = null;
-
-// Index terakhir yang kepilih tiap pool — dipakai biar file yang SAMA ga
-// keputer 2x berturut-turut. Murni Math.random() bisa aja ngasih hasil sama
-// beberapa kali beruntun (itu wajar, bukan bug), tapi kedengerannya kayak
-// "kok gini-gini aja" — jadi di sini kita sengaja larang pengulangan langsung.
-let lastBenarIdx = -1;
-let lastSalahIdx = -1;
-
-function pickRandomIndex(poolLength, lastIdx) {
-  if (poolLength <= 1) return 0;
-  let idx;
-  do {
-    idx = Math.floor(Math.random() * poolLength);
-  } while (idx === lastIdx);
-  return idx;
-}
