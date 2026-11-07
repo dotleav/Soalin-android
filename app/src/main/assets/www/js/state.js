@@ -68,6 +68,12 @@ let tentamenAdvanceHandle = null;
 let tentamenFadeKey = null;
 let tentamenReviewIdx = null;        // soal yang sedang ditinjau (null = soal berjalan)
 let tentamenReviewListOpen = false;  // daftar soal sebelumnya terbuka/tidak
+// Mode CBT (Other Modes → CBT) — ephemeral, tidak disimpan
+let cbtTimeLimitSec = 7200;  // batas waktu satu paket (default 2 jam), diatur di pemilih mode
+let cbtSessionSec = 7200;    // batas waktu paket untuk sesi yang sedang berjalan
+let cbtDeadline = 0;         // epoch ms: kapan waktu paket habis
+let cbtTimeLeft = 0;         // detik tersisa (untuk tampilan)
+let cbtExpired = false;      // true = waktu paket habis → jawaban dikunci, tinggal Submit
 
 // ── Paket soal / kategori: manifest, load, switch ─────────────────────────
 async function loadManifest() {

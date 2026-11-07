@@ -15,8 +15,8 @@ function renderHeaderZone() {
   } else if (quizMode === "tentamen" && tentamenState === "running") {
     trackerHtml = `
       <div class="tracker">
-        <div class="count mono">${currentIdx + 1}/${tentamenQuestions.length}</div>
-        <div class="sub">soal</div>
+        <div class="count mono" id="trackerCount">${cbtActive() ? cbtAnsweredCount() + "/" + tentamenQuestions.length : (currentIdx + 1) + "/" + tentamenQuestions.length}</div>
+        <div class="sub">${cbtActive() ? "dijawab" : "soal"}</div>
       </div>
     `;
   }
@@ -49,8 +49,8 @@ function renderHeaderZone() {
             <span class="arrow">\u25B2</span>
           </button>
           <button class="muteBtn${isMuted ? "" : " on"}" id="muteBtn" title="${isMuted ? "Nyalakan suara" : "Matikan suara"}">${isMuted ? "\uD83D\uDD07" : "\uD83D\uDD0A"}</button>
-          <button class="pillBtn${quizMode === "biasa" ? " active" : ""}" data-mode="biasa">Mode Latihan</button>
-          <button class="pillBtn${quizMode === "tentamen" ? " active" : ""}" data-mode="tentamen">Mode Tentamen</button>
+          <button class="pillBtn${quizMode === "biasa" ? " active" : ""}" data-mode="biasa">Default Mode</button>
+          <button class="pillBtn${quizMode === "tentamen" ? " active" : ""}" data-mode="tentamen">Other Modes</button>
           ${showFilterBar ? `<button class="shuffleBtn${activeShuffle ? " active" : ""}" id="shuffleBtn">\u2928 Acak ${activeShuffle ? "ON" : "OFF"}</button>` : ""}
           ${showReset ? `<button class="resetBtn" id="resetBtn">\u21BA Reset</button>` : ""}
         </div>

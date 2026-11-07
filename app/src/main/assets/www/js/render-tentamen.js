@@ -1,7 +1,8 @@
 // ── Render: Tentamen — setup ──────────────────────────────────────────────
 function renderTentamenSetup() {
-  const qCount = allQuestions.filter(q => !q.isBroken).length; // soal rusak tidak masuk tentamen; soal isian ikut
+  const qCount = allQuestions.filter(q => !q.isBroken).length; // soal rusak tidak masuk; soal isian ikut
   const cfg = DIFFICULTY_CONFIG[tentamenDifficulty];
+  const cbt = !!cfg.cbt;
   const timerSec = cfg.timerSeconds;
   const estLabel = (() => {
     if (timerSec === 0) return "\u221E";
@@ -11,34 +12,30 @@ function renderTentamenSetup() {
   })();
   const timerLabel = timerSec === 0 ? "\u221E" : `${timerSec}s`;
 
+  // Other Modes: tiap mode tampil sebagai stiker. Mode bertimer per soal (Tentamen)
+  // diberi lencana "Tentamen" di pojok kanan atas. Bekicot & CBT bukan Tentamen.
   let html = `<div class="quiz-fade-in">`;
-  html += `<div style="margin-bottom:16px;">
-    <div class="sectionLabel">Tingkat Kesulitan</div>
-    <div class="diffGrid">`;
+  html += `<div>
+    <div class="sectionLabel">Pilih mode</div>
+    <div class="modeGrid">`;
   Object.keys(DIFFICULTY_CONFIG).forEach(d => {
-    const dcfg = DIFFICULTY_CONFIG[d];
-    const active = tentamenDifficulty === d;
-    html += `
-      <button class="diffCard${active ? " active" : ""}" data-diff="${d}" style="${active ? `border-color:${dcfg.color}; background:${dcfg.color}18;` : ""}">
-        <div class="diffTop">
-          <span class="diffEmoji">${diffIconHtml(dcfg, "diffIcon")}</span>
-          <span class="diffLabel" style="color:${active ? dcfg.color : "var(--text)"};">${dcfg.label}</span>
-        </div>
-        <div class="diffDesc">${escapeHtml(dcfg.desc)}</div>
-        <div class="diffTimer" style="color:${active ? dcfg.color : "var(--muted3)"};">${dcfg.timerSeconds === 0 ? "5-7 hari kerja" : `${dcfg.timerSeconds}s / soal`}</div>
-      </button>
-    `;
+    html += modeTileHtml(d, tentamenDifficulty === d);
   });
   html += `</div></div>`;
 
   html += `<div class="statsRow3">
-    <div class="statBox2"><div class="val">${qCount}</div><div class="lbl">Soal</div></div>
-    <div class="statBox2"><div class="val">${timerLabel}</div><div class="lbl">Timer/soal</div></div>
-    <div class="statBox2"><div class="val">${estLabel}</div><div class="lbl">Estimasi</div></div>
-  </div>`;
+    <div class="statBox2"><div class="val">${qCount}</div><div class="lbl">Soal</div></div>`;
+  html += cbt
+    ? `<div class="statBox2"><div class="val" id="cbtStatTime">${cbtFmtDurasi(cbtTimeLimitSec)}</div><div class="lbl">Batas paket</div></div>
+       <div class="statBox2"><div class="val">Bebas</div><div class="lbl">Navigasi</div></div>`
+    : `<div class="statBox2"><div class="val">${timerLabel}</div><div class="lbl">Timer/soal</div></div>
+       <div class="statBox2"><div class="val">${estLabel}</div><div class="lbl">Estimasi</div></div>`;
+  html += `</div>`;
+
+  if (cbt) html += renderCbtTimeBar();
 
   html += `<button class="startTentamenBtn" id="startTentamenBtn" style="background:${cfg.color};" ${qCount === 0 ? "disabled" : ""}>
-    \u25B6 Mulai Tentamen \u2014 ${diffIconHtml(cfg, "startIcon")} ${cfg.label}
+    \u25B6 Mulai <img class="startSticker" src="${cfg.sticker}" alt="" aria-hidden="true">
   </button>`;
   html += `</div>`;
   return html;
@@ -128,6 +125,9 @@ function renderTentamenResults() {
   }).length;
   const skipped = tentamenAnswers.filter(a => a === "skipped").length;
   const wrong = total - correct - skipped;
+  const cbtRes = cbtActive();                 // CBT: soal kosong, bukan salah
+  const skipLbl = cbtRes ? "Kosong" : "Terlewati";
+  const skipWord = cbtRes ? "kosong" : "terlewati";
   const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
   const gradeColor = pct >= 80 ? "var(--correct)" : pct >= 60 ? "var(--accent)" : "var(--wrong)";
   const gradeLabel = pct >= 80 ? "Sangat Baik" : pct >= 60 ? "Cukup Baik" : "Perlu Belajar Lagi";
@@ -147,7 +147,7 @@ function renderTentamenResults() {
     <div class="statsGrid statsGrid3">
       <div class="statBox" style="background:#16a34a20; border-color:#16a34a40; color:var(--correct);"><div class="val mono">${correct}</div><div class="lbl">Benar</div></div>
       <div class="statBox" style="background:#ef444420; border-color:#ef444440; color:var(--wrong);"><div class="val mono">${wrong}</div><div class="lbl">Salah</div></div>
-      <div class="statBox" style="background:#94a3b818; border-color:#94a3b835; color:#94a3b8;"><div class="val mono">${skipped}</div><div class="lbl">Terlewati</div></div>
+      <div class="statBox" style="background:#94a3b818; border-color:#94a3b835; color:#94a3b8;"><div class="val mono">${skipped}</div><div class="lbl">${skipLbl}</div></div>
     </div>
   `;
 
@@ -162,12 +162,12 @@ function renderTentamenResults() {
       <div class="distLegend">
         <span style="color:var(--correct);">${pct}% benar</span>
         <span style="color:var(--wrong);">${total ? Math.round((wrong/total)*100) : 0}% salah</span>
-        <span style="color:#94a3b8;">${total ? Math.round((skipped/total)*100) : 0}% terlewati</span>
+        <span style="color:#94a3b8;">${total ? Math.round((skipped/total)*100) : 0}% ${skipWord}</span>
       </div>
     </div>
   `;
 
-  html += `<button class="restartBtn" id="restartTentamenBtn">\u21BA Ulangi Tentamen</button>`;
+  html += `<button class="restartBtn" id="restartTentamenBtn">\u21BA Ulangi</button>`;
 
   html += `<div class="reviewLabel">Detail jawaban:</div>`;
   html += `<div class="reviewList">`;

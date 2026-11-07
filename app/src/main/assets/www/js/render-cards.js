@@ -52,7 +52,7 @@ function renderIsianCard(q, qNum, answeredValue) {
   if (isSkipped) {
     bodyHtml = `
       <div class="isianReveal">
-        <div class="skipNote">⏭️ Soal ini dilewati (waktu habis)</div>
+        <div class="skipNote">⏭️ Soal ini dilewati${cbtActive() ? " (belum dijawab)" : " (waktu habis)"}</div>
         <div class="explanation">
           <div class="tag">🔑 Kunci Jawaban</div>
           <p>${escapeHtml(q.answer || "(tidak ada kunci jawaban)")}</p>
@@ -102,7 +102,7 @@ function optionImageHtml(src) {
 }
 
 // ── Render: kartu soal (dipakai di semua mode) ────────────────────────────
-function renderQuestionCard(q, qNum, chosen, revealAnswer) {
+function renderQuestionCard(q, qNum, chosen, revealAnswer, opts = {}) {
   const isAnswered = chosen !== undefined && chosen !== null;
   const showState = revealAnswer && isAnswered;
   const oExp = q.optionExplanations || {};
@@ -111,7 +111,7 @@ function renderQuestionCard(q, qNum, chosen, revealAnswer) {
     let cls = "option";
     let letterCls = "letter";
     let icon = "";
-    const locked = isAnswered ? " locked" : "";
+    const locked = (opts.lock || (isAnswered && !opts.free)) ? " locked" : "";
     const imgSrc = (q.optionImages || {})[letter];
     if (imgSrc) cls += " hasImg";
 
@@ -151,7 +151,7 @@ function renderQuestionCard(q, qNum, chosen, revealAnswer) {
   }).join("");
 
   const skipNoteHtml = (showState && chosen === "skipped")
-    ? `<div class="skipNote">\u23ED\uFE0F Soal ini dilewati (waktu habis)</div>`
+    ? `<div class="skipNote">\u23ED\uFE0F Soal ini dilewati${cbtActive() ? " (belum dijawab)" : " (waktu habis)"}</div>`
     : "";
 
   // Card Gambar Penjelasan: teks opsional, utamanya gambar. Tidak tampil kalau kosong.

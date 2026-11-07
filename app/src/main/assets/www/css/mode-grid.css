@@ -1,0 +1,169 @@
+/* ── Other Modes: pemilih mode bergaya stiker + mode CBT ─────────────────── */
+/* Dimuat terakhir: menimpa aturan tema (p5, sxf, doksli) bila perlu. */
+
+/* ── Pemilih mode: stiker + teks lucu di bawahnya ── */
+.modeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+  gap: 16px 10px;
+  margin-bottom: 18px;
+}
+.modeTile {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 8px 4px 4px;
+  background: none; border: 0; border-radius: 14px;
+  color: var(--text); font: inherit; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s;
+}
+.modeTile:hover { transform: translateY(-2px); }
+.modeTile:focus-visible { outline: 2px dashed var(--accent); outline-offset: 3px; }
+.modeSticker {
+  display: block; width: 100%; max-width: 150px; height: auto;
+  -webkit-user-drag: none; user-select: none; pointer-events: none;
+  filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.22));
+  opacity: 0.72;
+  transition: transform 0.18s, filter 0.18s, opacity 0.18s;
+}
+.modeTile:hover .modeSticker { opacity: 0.95; }
+.modeTile.active .modeSticker {
+  opacity: 1;
+  transform: translateY(-3px) scale(1.04);
+  filter: drop-shadow(0 0 10px var(--mc)) drop-shadow(0 6px 0 rgba(0, 0, 0, 0.3));
+}
+.modeCaption {
+  min-height: 3.6em;
+  font-size: 0.78rem; line-height: 1.35; text-align: center;
+  color: var(--muted);
+}
+.modeCaption s { opacity: 0.85; }
+.modeCaption b { color: var(--text); }
+.modeTile.active .modeCaption { color: var(--mc); font-weight: 700; }
+.modeTile.active .modeCaption b { color: var(--mc); }
+.modeBadge {
+  position: absolute; top: 0; right: 0; z-index: 2;
+  padding: 3px 8px; border-radius: 999px;
+  background: var(--accent); color: #1b1200;
+  font-size: 0.6rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+  transform: rotate(7deg);
+  pointer-events: none;
+}
+.startSticker { height: 1.5em; width: auto; vertical-align: middle; margin-left: 2px; }
+
+/* ── CBT: batas waktu satu paket ── */
+.cbtTimeCard {
+  background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius-md);
+  padding: 14px 16px; margin-bottom: 16px; box-shadow: var(--shadow-card);
+}
+.cbtTimeHead { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.cbtTimeTitle { margin: 0; }
+.cbtTimeVal { color: var(--accent); font-weight: 700; font-size: 0.95rem; }
+.cbtTimeRow { display: flex; align-items: center; gap: 12px; }
+.cbtTimeRange { flex: 1; accent-color: var(--accent); }
+.cbtTimeNumWrap { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.8rem; }
+.cbtTimeNum {
+  width: 78px; padding: 8px 10px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border); background: var(--card-soft); color: var(--text);
+  font-family: "JetBrains Mono", monospace; font-weight: 700;
+}
+.cbtTimeHint { margin: 10px 0 0; font-size: 0.74rem; color: var(--muted2); line-height: 1.5; }
+
+/* ── CBT: mengerjakan paket ── */
+#cbtCard { scroll-margin-top: 130px; }
+.cbtTopBar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+.cbtTimer {
+  display: flex; align-items: baseline; gap: 10px;
+  background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius-md);
+  padding: 8px 14px; box-shadow: var(--shadow-card); transition: border-color 0.3s;
+}
+.cbtTimer.urgent, .cbtTimer.expired { border-color: var(--wrong-strong); }
+.cbtTimerLbl { font-size: 0.72rem; color: var(--muted); font-weight: 600; }
+.cbtTimerNum { font-size: 1.5rem; font-weight: 700; line-height: 1; color: var(--cbt, var(--accent)); }
+.cbtTimer.urgent .cbtTimerNum, .cbtTimer.expired .cbtTimerNum { color: var(--wrong-strong); }
+.cbtQOf { font-size: 0.78rem; color: var(--muted); }
+.cbtTrack { background: var(--border-light); border-radius: 999px; height: 7px; overflow: hidden; margin-bottom: 14px; }
+.cbtTrackFill { height: 100%; border-radius: 999px; background: var(--cbt, var(--accent)); transition: width 1s linear; }
+.cbtNavRow { display: flex; gap: 10px; margin: 14px 0 18px; }
+.cbtArrow {
+  flex: 1; padding: 11px 10px; border-radius: var(--radius-md);
+  border: 1.5px solid var(--border); background: var(--card); color: var(--text);
+  font-weight: 700; font-size: 0.84rem; cursor: pointer; box-shadow: var(--shadow-card);
+  transition: transform 0.12s, border-color 0.15s;
+}
+.cbtArrow:hover:not(:disabled) { transform: translateY(-1px); border-color: var(--cbt, var(--accent)); }
+.cbtArrow:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+.cbtGridHead {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 0.74rem; color: var(--muted2); font-weight: 700; letter-spacing: 0.03em;
+  margin-bottom: 10px;
+}
+.cbtGrid { --cbt-done: #22c55e; display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.cbtNum {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: grid; place-items: center; padding: 0;
+  border: 2px solid var(--border); background: var(--card); color: var(--text);
+  font-family: "JetBrains Mono", monospace; font-size: 0.85rem; font-weight: 700;
+  cursor: pointer; box-shadow: 0 3px 0 rgba(10, 6, 26, 0.45);
+  transition: transform 0.12s, background 0.15s, border-color 0.15s;
+}
+.cbtNum:hover { transform: translateY(-1px); border-color: var(--cbt, var(--accent)); }
+.cbtNum.done { background: var(--cbt-done); border-color: var(--cbt-done); color: #052e16; }
+.cbtNum.current { box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--cbt, var(--accent)); }
+.cbtSubmitSlot { margin-top: 4px; }
+.cbtSubmitBtn { color: #1b1200; }
+.cbtHint {
+  text-align: center; font-size: 0.8rem; color: var(--muted); line-height: 1.5;
+  padding: 10px 12px; margin: 0; border: 1px dashed var(--border); border-radius: var(--radius-md);
+}
+.cbtIsianInput {
+  width: 100%; min-height: 96px; resize: vertical;
+  background: var(--card-soft); color: var(--text);
+  border: 1.5px solid var(--border); border-radius: var(--radius-md);
+  padding: 12px; font: inherit; line-height: 1.5;
+}
+.cbtIsianInput:focus { outline: none; border-color: var(--cbt, var(--accent)); }
+.cbtIsianInput:disabled { opacity: 0.6; }
+
+/* ── Tema Persona 5: kotak tajam, skew, putih-merah ── */
+body.p5 .modeBadge {
+  background: #fff; color: #000; border-radius: 0;
+  font-family: "Bebas Neue", sans-serif; font-size: 0.82rem; letter-spacing: 0.12em;
+  padding: 1px 8px; transform: skewX(-8deg) rotate(4deg);
+  box-shadow: 3px 3px 0 #ff0022;
+}
+body.p5 .modeCaption {
+  font-family: "Bebas Neue", sans-serif; font-size: 0.95rem; letter-spacing: 0.06em;
+  text-transform: uppercase; color: #bdbdbd;
+}
+body.p5 .modeTile.active .modeCaption { color: #fff; background: #ff0022; padding: 1px 10px; transform: skewX(-6deg); }
+body.p5 .modeTile.active .modeCaption b { color: #fff; }
+body.p5 .modeTile.active .modeSticker {
+  filter: drop-shadow(0 0 12px rgba(255, 0, 34, 0.9)) drop-shadow(0 6px 0 rgba(0, 0, 0, 0.45));
+}
+body.p5 .cbtTimer { border: 2px solid #fff; border-radius: 0; background: #000; transform: skewX(-4deg); box-shadow: 3px 3px 0 rgba(255, 0, 34, 0.6); }
+body.p5 .cbtTimer.urgent, body.p5 .cbtTimer.expired { border-color: #ff0022; }
+body.p5 .cbtArrow { border-radius: 0; background: #000; color: #fff; border: 2px solid #fff; transform: skewX(-4deg); }
+body.p5 .cbtArrow:hover:not(:disabled) { background: #fff; color: #000; }
+body.p5 .cbtNum { border-radius: 50%; background: #000; color: #fff; border: 2px solid #fff; box-shadow: 3px 3px 0 rgba(255, 0, 34, 0.5); }
+body.p5 .cbtNum.done { background: #22c55e; color: #000; border-color: #fff; }
+body.p5 .cbtNum.current { background: #ff0022; border-color: #fff; }
+body.p5 .cbtIsianInput { border-radius: 0; border: 2px solid #fff; background: #000; color: #fff; }
+body.p5 .cbtIsianInput:focus { border-color: #ff0022; }
+
+/* ── Tema Spy x Family: pastel, pill ── */
+body.sxf .modeBadge {
+  background: linear-gradient(135deg, #ffb6c1, #ff8fab); color: #fff;
+  border: 2px solid #fff; box-shadow: 0 3px 8px rgba(232, 85, 122, 0.35);
+}
+body.sxf .modeCaption b { color: #6b3050; }
+body.sxf .modeTile.active .modeCaption { color: #e8557a; }
+body.sxf .modeTile.active .modeCaption b { color: #e8557a; }
+body.sxf .cbtTimer, body.sxf .cbtArrow { border-radius: 999px; }
+body.sxf .cbtNum { background: #fff; color: #3d1a2e; border-color: #f7c1da; }
+body.sxf .cbtNum.done { background: #7ed9b6; color: #1f4d3f; border-color: #7ed9b6; }
+body.sxf .cbtNum.current { box-shadow: 0 0 0 3px #fff, 0 0 0 5px #e8557a; }
+
+/* ── Catatan kecil di tile (pacing per soal di pemilih Multiplayer) ── */
+.modeNote { font-family: "JetBrains Mono", monospace; font-size: 0.7rem; font-weight: 700; color: var(--mc); }

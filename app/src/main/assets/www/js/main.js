@@ -22,7 +22,7 @@ function render() {
     html += biasaLoaded ? renderBiasaMode() : `<div class="empty">Memuat soal\u2026</div>`;
   } else {
     if (tentamenState === "setup") html += renderTentamenSetup();
-    else if (tentamenState === "running") html += renderTentamenRunning();
+    else if (tentamenState === "running") html += (cbtActive() ? renderCbtRunning() : renderTentamenRunning());
     else html += renderTentamenResults();
   }
 
@@ -105,7 +105,7 @@ function attachHandlers() {
   const loadMoreBtn = document.getElementById("loadMoreBtn");
   if (loadMoreBtn) loadMoreBtn.addEventListener("click", handleBiasaLoadMore);
 
-  app.querySelectorAll(".diffCard[data-diff]").forEach(btn => {
+  app.querySelectorAll(".modeTile[data-diff]").forEach(btn => {
     btn.addEventListener("click", () => { tentamenDifficulty = btn.dataset.diff; render(); });
   });
 

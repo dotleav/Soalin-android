@@ -107,6 +107,7 @@ function handleStartTentamen() {
   const quizzable = allQuestions.filter(q => !q.isBroken);
   const qs = tentamenShuffleOn ? shuffleArray(quizzable) : quizzable;
   if (!qs.length) return;
+  if (cbtActive()) { cbtStartSession(qs); return; }
   tentamenQuestions = qs;
   tentamenAnswers = new Array(qs.length).fill(null);
   currentIdx = 0;
@@ -183,6 +184,8 @@ function onOptionClick(qid, letter, btnEl) {
   if (theme === "p5") { window.p5LastOptionEl = btnEl || null; window.p5LastLetter = letter; }
   if (quizMode === "biasa") {
     handleAnswerBiasa(qid, letter);
+  } else if (cbtActive() && tentamenState === "running") {
+    handleCbtAnswer(letter);
   } else if (quizMode === "tentamen" && tentamenState === "running" && qPhase === "answering") {
     handleAnswerTentamen(letter);
   }

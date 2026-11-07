@@ -28,17 +28,10 @@ function renderMultiplayerScreen() {
 }
 
 function renderMpJoin() {
-  const cards = Object.keys(DIFFICULTY_CONFIG).map((k) => {
+  const cards = Object.keys(DIFFICULTY_CONFIG).filter((k) => !DIFFICULTY_CONFIG[k].cbt).map((k) => {
     const c = DIFFICULTY_CONFIG[k];
-    const on = mpDiff === k;
     const timer = c.timerSeconds === 0 ? "\u221E" : `${c.timerSeconds}s`;
-    return `
-      <button class="mpDiffCard${on ? " on" : ""}" data-mp-act="pickdiff" data-diff="${k}" style="--dc:${c.color};">
-        <span class="mpDiffEmoji">${c.emoji || ""}</span>
-        <span class="mpDiffLabel">${escapeHtml(c.label)}</span>
-        <span class="mpDiffTimer mono">${timer} / soal</span>
-        <span class="mpDiffDesc">${escapeHtml(c.desc || "")}</span>
-      </button>`;
+    return modeTileHtml(k, mpDiff === k, `data-mp-act="pickdiff"`, `<span class="modeNote mono">${timer} / soal</span>`);
   }).join("");
   const dcfg = DIFFICULTY_CONFIG[mpDiff] || DIFFICULTY_CONFIG.bekicot;
   return `
@@ -54,11 +47,11 @@ function renderMpJoin() {
         ${mpErrorHtml()}
         <div class="mpDivider"></div>
         <div class="sectionLabel">Jadi host? Pilih mode</div>
-        <div class="mpDiffGrid">${cards}</div>
+        <div class="modeGrid">${cards}</div>
         <button class="mpShuffleRow${mpShuffle ? " on" : ""}" data-mp-act="toggleshuffle">
           <span>\uD83D\uDD00 Acak urutan soal</span><span class="mpSwitch${mpShuffle ? " on" : ""}"></span>
         </button>
-        <button class="mpCreateBtn" data-mp-act="create" style="background:${dcfg.color};" ${mpBusy ? "disabled" : ""}>\u25B6 Buat room \u00B7 ${escapeHtml(dcfg.label)}</button>
+        <button class="mpCreateBtn" data-mp-act="create" style="background:${dcfg.color};" ${mpBusy ? "disabled" : ""}>\u25B6 Buat room <img class="startSticker" src="${dcfg.sticker}" alt="" aria-hidden="true"></button>
       </div>
     </main>`;
 }
@@ -127,7 +120,7 @@ function renderMpLobby() {
   const chips = mpPlayerList(mpIsHost);
   return `
     <p class="mpSub">${escapeHtml(mpRoom.meta.title)} \u00B7 ${mpRoom.meta.count} soal</p>
-    <p class="mpSub">${escapeHtml(mpModeLabel(mpRoom.meta))}</p>
+    <p class="mpSub"><img class="startSticker" src="${(DIFFICULTY_CONFIG[mpRoom.meta.difficulty] || DIFFICULTY_CONFIG.bekicot).sticker}" alt="" aria-hidden="true"> ${escapeHtml(mpModeLabel(mpRoom.meta))}</p>
     <div class="sectionLabel">Pemain (${names.length})</div>
     <div class="mpPlayers">${chips || `<span class="mpSub">Belum ada pemain</span>`}</div>
     ${mpIsHost
