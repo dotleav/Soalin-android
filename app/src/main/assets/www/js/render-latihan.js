@@ -9,14 +9,16 @@ function renderHeaderZone() {
     trackerHtml = `
       <div class="tracker">
         <div class="count mono">${answeredCount}/${totalQ}</div>
-        <div class="sub">dijawab \u00B7 benar <span class="ok">${correctCount}</span></div>
+        <div class="sub"><span class="ok">${correctCount}</span>/<span class="bad">${answeredCount - correctCount}</span></div>
       </div>
     `;
   } else if (quizMode === "tentamen" && tentamenState === "running") {
+    const tentAnswered = tentamenAnswers.filter((a) => a !== null && a !== undefined && a !== "skipped").length;
+    const tentCorrect = tentamenAnswers.filter((a, i) => a && a !== "skipped" && (tentamenQuestions[i]?.isIsian || a === tentamenQuestions[i]?.answer)).length;
     trackerHtml = `
       <div class="tracker">
-        <div class="count mono" id="trackerCount">${cbtActive() ? cbtAnsweredCount() + "/" + tentamenQuestions.length : (currentIdx + 1) + "/" + tentamenQuestions.length}</div>
-        <div class="sub">${cbtActive() ? "dijawab" : "soal"}</div>
+        <div class="count mono" id="trackerCount">${cbtActive() ? `${cbtAnsweredCount()}/${tentamenQuestions.length}` : `${tentAnswered}/${tentamenQuestions.length}`}</div>
+        <div class="sub">${cbtActive() ? "" : `<span class="ok">${tentCorrect}</span>/<span class="bad">${tentAnswered - tentCorrect}</span>`}</div>
       </div>
     `;
   }
@@ -33,9 +35,10 @@ function renderHeaderZone() {
           <div class="headerInner">
             <div class="titleRow">
               <div>
+                <button class="pkgSwitchBtn iconBtn" id="pkgSwitchBtn" title="${activePackage ? "Ganti paket" : "Pilih paket soal"}" aria-label="${activePackage ? "Ganti paket" : "Pilih paket soal"}">${svgIcon("folder")} <span class="lbl">${activePackage ? "Ganti paket" : "Pilih paket soal"}</span></button>
                 <h1${activePackage ? ` class="pkgTitleActive"` : ""}>${activePackage ? escapeHtml(activePackage.title) : "Quiz App"}</h1>
                 ${activePackage ? `<div class="pkgSubtitle">${escapeHtml(activePackage.category)}</div>` : ""}
-                <button class="pkgSwitchBtn" id="pkgSwitchBtn">\uD83D\uDCC2 ${activePackage ? "Ganti paket" : "Pilih paket soal"}</button>
+                
               </div>
               ${trackerHtml}
             </div>
@@ -46,20 +49,20 @@ function renderHeaderZone() {
       <div class="modeBar">
         <div class="modeBarInner">
           <button class="hideToggleBtn${headerHidden ? " active" : ""}" id="hideHeaderBtn" title="Sembunyikan header" aria-label="Sembunyikan header">
-            <span class="arrow">\u25B2</span>
+            <span class="arrow">${svgIcon("chevron-up")}</span>
           </button>
-          <button class="muteBtn${isMuted ? "" : " on"}" id="muteBtn" title="${isMuted ? "Nyalakan suara" : "Matikan suara"}">${isMuted ? "\uD83D\uDD07" : "\uD83D\uDD0A"}</button>
-          <button class="pillBtn${quizMode === "biasa" ? " active" : ""}" data-mode="biasa">Default Mode</button>
-          <button class="pillBtn${quizMode === "tentamen" ? " active" : ""}" data-mode="tentamen">Other Modes</button>
-          ${showFilterBar ? `<button class="shuffleBtn${activeShuffle ? " active" : ""}" id="shuffleBtn">\u2928 Acak ${activeShuffle ? "ON" : "OFF"}</button>` : ""}
-          ${showReset ? `<button class="resetBtn" id="resetBtn">\u21BA Reset</button>` : ""}
+          <button class="muteBtn${isMuted ? "" : " on"}" id="muteBtn" title="${isMuted ? "Nyalakan suara" : "Matikan suara"}">${isMuted ? svgIcon("speaker-off") : svgIcon("speaker")}</button>
+          <button class="pillBtn${quizMode === "biasa" ? " active" : ""}" data-mode="biasa">Default</button>
+          <button class="pillBtn${quizMode === "tentamen" ? " active" : ""}" data-mode="tentamen">Modes</button>
+          ${showFilterBar ? `<button class="shuffleBtn iconBtn${activeShuffle ? " active" : ""}" id="shuffleBtn" aria-pressed="${activeShuffle}" aria-label="Acak soal" title="Acak soal: ${activeShuffle ? "ON" : "OFF"}">${svgIcon("shuffle")} <span class="lbl">Acak ${activeShuffle ? "ON" : "OFF"}</span></button>` : ""}
+          ${showReset ? `<button class="resetBtn iconBtn" id="resetBtn" title="Reset" aria-label="Reset">${svgIcon("reset")} <span class="lbl">Reset</span></button>` : ""}
         </div>
       </div>`}
 
       ${headerHidden ? `
       <div class="collapsedToggleWrap">
         <button class="hideToggleBtn" id="hideHeaderBtn" title="Tampilkan header" aria-label="Tampilkan header">
-          <span class="arrow" style="transform:rotate(180deg);">\u25B2</span>
+          <span class="arrow" style="transform:rotate(180deg);">${svgIcon("chevron-up")}</span>
         </button>
       </div>` : ""}
     </div>
@@ -83,7 +86,7 @@ function renderBiasaMode() {
   let html = `
     <div class="progressCard">
       <div class="progressTop">
-        <span class="left">Sudah dijawab: <span class="num mono">${answeredCount}</span> / Total: <span class="num total mono">${totalCount}</span></span>
+        <span class="left"><span class="v2hide">Sudah dijawab: </span><span class="num mono">${answeredCount}</span> / <span class="num total mono">${totalCount}</span></span>
         <div style="display:flex; gap:12px;">
           <span class="statChip"><span class="dot" style="background:var(--correct);"></span><span class="mono" style="color:var(--correct); font-weight:700;">${correctCount}</span><span style="color:var(--muted2);">benar</span></span>
           <span class="statChip"><span class="dot" style="background:var(--wrong);"></span><span class="mono" style="color:var(--wrong); font-weight:700;">${answeredCount - correctCount}</span><span style="color:var(--muted2);">salah</span></span>
@@ -96,9 +99,9 @@ function renderBiasaMode() {
   if (allDone) {
     html += `
       <div class="doneBanner">
-        <span style="font-size:1.3rem;">\uD83C\uDFC6</span>
+        <span style="font-size:1.3rem;">${svgIcon("award")}</span>
         <div>
-          <span class="title">Selesai! </span>
+          <span class="title v2hide">Selesai! </span>
           <span class="sub">Skor akhir: ${correctCount}/${totalCount} (${Math.round((correctCount/totalCount)*100)}%)</span>
         </div>
       </div>
@@ -124,7 +127,7 @@ function renderBiasaMode() {
   html += `</div>`;
 
   if (hasMore) {
-    html += `<button class="loadMoreBtn" id="loadMoreBtn">\u2794 Lebih banyak (${Math.min(LOAD_BATCH, remaining)})</button>`;
+    html += `<button class="loadMoreBtn" id="loadMoreBtn">${svgIcon("chevron-right")} Lebih banyak (${Math.min(LOAD_BATCH, remaining)})</button>`;
   }
 
   return html;

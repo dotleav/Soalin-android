@@ -1,0 +1,38 @@
+/* ── Header kompak untuk semua tema ───────────────────────────────────────────
+   Tinggi header dibatasi supaya ruang soal lebih lega di HP: judul satu baris,
+   folder di kiri judul, angka tracker sejajar folder, kategori dan teks progress
+   tidak ditulis. Dimuat paling akhir supaya berlaku di atas aturan tema. */
+.headerZone::after { display: none !important; }
+.headerZone::before { height: 3px !important; }
+header { padding: 6px 0 !important; }
+.headerInner { padding: 0 12px !important; }
+.titleRow { flex-wrap: nowrap !important; align-items: center !important; gap: 10px !important; }
+.titleRow > div:first-child { display: flex !important; flex-wrap: nowrap !important; align-items: center !important; gap: 8px !important; min-width: 0 !important; flex: 1 1 auto !important; }
+.pkgSwitchBtn { flex: none !important; width: 34px !important; height: 34px !important; min-width: 0 !important; padding: 0 !important; margin: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; }
+.pkgSwitchBtn .lbl { display: none !important; }
+.pkgSwitchBtn svg { width: 1.1rem !important; height: 1.1rem !important; }
+h1.pkgTitleActive { flex: 1 1 0 !important; min-width: 0 !important; margin: 0 !important; line-height: 1.25 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+.pkgSubtitle { display: none !important; }
+.tracker { flex: none !important; align-self: center !important; margin-left: 0 !important; min-width: 0 !important; }
+.tracker .count { font-size: 0.95rem !important; line-height: 1.2 !important; }
+.tracker .sub { font-size: 0.72rem !important; line-height: 1.2 !important; }
+.modeBar { padding: 6px 0 !important; }
+.modeBarInner { gap: 6px !important; }
+.progressTop { display: none !important; }
+.progressCard { padding: 8px 12px !important; margin-bottom: 8px !important; }
+
+/* Toolbar satu baris di semua tema: Acak dan Reset ikon saja, nyala/mati dibedakan lewat warna */
+.modeBarInner { flex-wrap: nowrap !important; }
+.shuffleBtn .lbl, .resetBtn .lbl { display: none !important; }
+.shuffleBtn, .resetBtn { width: 34px !important; height: 34px !important; min-width: 0 !important; padding: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; }
+.shuffleBtn svg, .resetBtn svg { width: 1.05rem !important; height: 1.05rem !important; }
+.shuffleBtn:not(.active) { opacity: 0.5 !important; }
+body.p5 h1.pkgTitleActive, body.doksli h1.pkgTitleActive { letter-spacing: 0.02em !important; }
+/* Tracker tidak terpotong di tema manapun (angka kedua selalu tampil) */
+.tracker, .tracker .count, .tracker .sub { overflow: visible !important; width: auto !important; max-width: none !important; }
+.tracker .sub { white-space: nowrap !important; }
+/* Angka benar/salah tetap terbaca di header merah (Doksli) dan pink (SxF): chip putih kecil */
+body.sxf .tracker .sub, body.doksli .tracker .sub { background: #fff; padding: 1px 6px; border-radius: 999px; }
+/* Folder ganti paket di KANAN judul (urutan visual; DOM tetap) */
+h1.pkgTitleActive { order: 1 !important; }
+.pkgSwitchBtn { order: 2 !important; margin-left: 4px !important; }

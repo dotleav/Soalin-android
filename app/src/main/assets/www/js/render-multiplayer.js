@@ -17,7 +17,7 @@ function mpModeLabel(meta) {
 // Daftar pemain. Host bisa mengeluarkan pemain lewat tombol ✕.
 function mpPlayerList(kickable) {
   return Object.entries(mpRoom.players || {}).map(([uid, p]) => kickable
-    ? `<button class="mpChip" data-mp-act="kick" data-uid="${uid}">${escapeHtml(p.name)} \u2715</button>`
+    ? `<button class="mpChip" data-mp-act="kick" data-uid="${uid}">${escapeHtml(p.name)} ${svgIcon("close")}</button>`
     : `<span class="mpChip">${escapeHtml(p.name)}</span>`).join("");
 }
 
@@ -37,8 +37,8 @@ function renderMpJoin() {
   return `
     <main class="wrap">
       <div class="mpCard mpSetup">
-        <button class="mpLinkBtn" data-mp-act="back">\u2190 Kembali</button>
-        <h1 class="mpTitle">\uD83C\uDFAE Multiplayer</h1>
+        <button class="mpLinkBtn iconBtn" data-mp-act="back" title="Kembali" aria-label="Kembali">${svgIcon("chevron-left")} <span class="lbl">Kembali</span></button>
+        <h1 class="mpTitle">${svgIcon("gamepad")} Multiplayer</h1>
         <p class="mpSub">Masukkan kode room dari host.</p>
         <div class="mpJoinRow">
           <input id="mpCodeInput" class="mpInput mono" maxlength="4" placeholder="KODE" autocomplete="off" autocapitalize="characters" value="${escapeAttr(mpPendingCode)}">
@@ -49,9 +49,9 @@ function renderMpJoin() {
         <div class="sectionLabel">Jadi host? Pilih mode</div>
         <div class="modeGrid">${cards}</div>
         <button class="mpShuffleRow${mpShuffle ? " on" : ""}" data-mp-act="toggleshuffle">
-          <span>\uD83D\uDD00 Acak urutan soal</span><span class="mpSwitch${mpShuffle ? " on" : ""}"></span>
+          <span>${svgIcon("shuffle")} Acak urutan soal</span><span class="mpSwitch${mpShuffle ? " on" : ""}"></span>
         </button>
-        <button class="mpCreateBtn" data-mp-act="create" style="background:${dcfg.color};" ${mpBusy ? "disabled" : ""}>\u25B6 Buat room <img class="startSticker" src="${dcfg.sticker}" alt="" aria-hidden="true"></button>
+        <button class="mpCreateBtn" data-mp-act="create" style="background:${dcfg.color};" ${mpBusy ? "disabled" : ""}>${svgIcon("play")} Buat room <img class="startSticker" src="${dcfg.sticker}" alt="" aria-hidden="true"></button>
       </div>
     </main>`;
 }
@@ -62,7 +62,7 @@ function renderMpName() {
   return `
     <main class="wrap">
       <div class="mpCard">
-        <button class="mpLinkBtn" data-mp-act="back">\u2190 Kembali</button>
+        <button class="mpLinkBtn iconBtn" data-mp-act="back" title="Kembali" aria-label="Kembali">${svgIcon("chevron-left")} <span class="lbl">Kembali</span></button>
         <h1 class="mpTitle">Masuk room <span class="mono">${escapeHtml(mpPendingCode)}</span></h1>
         <p class="mpSub">Pilih username yang akan dilihat host dan pemain lain.</p>
         <input id="mpNameInput" class="mpInput" maxlength="20" placeholder="Username kamu" autocomplete="off" value="${escapeAttr(saved)}">
@@ -85,7 +85,7 @@ function renderMpRoom() {
   }
 
   const phase = mpRoom.state?.phase || "lobby";
-  const myName = mpIsHost ? "\uD83D\uDC51 Host" : escapeHtml(mpRoom.players?.[mpUid]?.name || "");
+  const myName = mpIsHost ? svgIcon("crown") + " Host" : escapeHtml(mpRoom.players?.[mpUid]?.name || "");
   const header = `
     <div class="mpTop">
       <div>
@@ -124,7 +124,7 @@ function renderMpLobby() {
     <div class="sectionLabel">Pemain (${names.length})</div>
     <div class="mpPlayers">${chips || `<span class="mpSub">Belum ada pemain</span>`}</div>
     ${mpIsHost
-      ? `<button class="mpPrimary" data-mp-act="start">\u25B6 Mulai kuis</button>`
+      ? `<button class="mpPrimary" data-mp-act="start">${svgIcon("play")} Mulai kuis</button>`
       : `<p class="mpSub">Menunggu host memulai\u2026</p>`}`;
 }
 
@@ -179,8 +179,8 @@ function renderMpPlaying() {
   if (!mpIsHost) {
     if (rev) {
       if (my === undefined) feedback = `<div class="mpFeedback">Kamu belum menjawab.</div>`;
-      else if (my === rev.answer) feedback = `<div class="mpFeedback ok">\u2705 Benar!</div>`;
-      else feedback = `<div class="mpFeedback bad">\u274C Salah. Jawaban yang benar: <b>${escapeHtml(rev.answer)}</b></div>`;
+      else if (my === rev.answer) feedback = `<div class="mpFeedback ok">${svgIcon("check")} Benar!</div>`;
+      else feedback = `<div class="mpFeedback bad">${svgIcon("close")} Salah. Jawaban yang benar: <b>${escapeHtml(rev.answer)}</b></div>`;
     } else if (my !== undefined) {
       feedback = `<div class="mpFeedback">Jawabanmu terkirim. Menunggu jawaban dibuka\u2026</div>`;
     } else if (timedOut) {
@@ -192,7 +192,7 @@ function renderMpPlaying() {
   let hostControls = "";
   if (mpIsHost) {
     const names = Object.entries(picks)
-      .map(([uid, l]) => `${escapeHtml(mpRoom.players?.[uid]?.name || "?")} \u2192 ${l}`)
+      .map(([uid, l]) => `${escapeHtml(mpRoom.players?.[uid]?.name || "?")} ${svgIcon("chevron-right")} ${l}`)
       .join(" \u00B7 ");
     hostControls = `
       <div class="mpHostInfo mono">${answeredCount}/${playerCount} sudah menjawab</div>
@@ -200,8 +200,8 @@ function renderMpPlaying() {
       ${names ? `<div class="mpSub mpPicks">${names}</div>` : ""}
       ${timed ? `<div class="mpSub">Otomatis: jawaban dibuka saat waktu habis.</div>` : ""}
       ${rev
-        ? `<button class="mpPrimary" data-mp-act="next">${i + 1 < total ? "Soal berikutnya \u2192" : "Selesai \u00B7 lihat skor"}</button>`
-        : `<button class="mpPrimary" data-mp-act="reveal">\uD83D\uDC41 Tampilkan jawaban</button>`}`;
+        ? `<button class="mpPrimary" data-mp-act="next">${i + 1 < total ? "Soal berikutnya " + svgIcon("chevron-right") : "Selesai · lihat skor"}</button>`
+        : `<button class="mpPrimary" data-mp-act="reveal">${svgIcon("eye")} Tampilkan jawaban</button>`}`;
   }
 
   return `
@@ -265,13 +265,13 @@ function mpReviewBarHtml() {
   if (!mpReviewAllowed(i)) return "";
   const solved = mpSolvedBefore(i);
   if (!solved.length) return "";
-  let html = `<div class="trvBar"><button class="trvToggle${mpReviewListOpen ? " open" : ""}" data-mp-rv="toggle" aria-expanded="${mpReviewListOpen}">\uD83D\uDCCB Soal sebelumnya <span class="mono">(${solved.length})</span></button></div>`;
+  let html = `<div class="trvBar"><button class="trvToggle${mpReviewListOpen ? " open" : ""}" data-mp-rv="toggle" aria-expanded="${mpReviewListOpen}">${svgIcon("list")} Soal sebelumnya <span class="mono">(${solved.length})</span></button></div>`;
   if (mpReviewListOpen) {
     html += `<div class="trvList">`;
     for (const j of solved) {
       const ok = mpMyAnswers[j] === mpRoom.reveal[j].answer;
       const snippet = String(mpRoom.questions[j]?.question || "").replace(/\s+/g, " ").slice(0, 80);
-      html += `<button class="trvItem ${ok ? "ok" : "bad"}" data-mp-rv="open" data-idx="${j}"><span class="trvNum mono">${j + 1}</span><span class="trvText">${escapeHtml(snippet)}</span><span class="trvChip">${ok ? "\u2713 Benar" : "\u2717 Salah"}</span></button>`;
+      html += `<button class="trvItem ${ok ? "ok" : "bad"}" data-mp-rv="open" data-idx="${j}"><span class="trvNum mono">${j + 1}</span><span class="trvText">${escapeHtml(snippet)}</span><span class="trvChip">${ok ? svgIcon("check") + " Benar" : svgIcon("close") + " Salah"}</span></button>`;
     }
     html += `</div>`;
   }
@@ -281,7 +281,7 @@ function mpReviewViewerHtml(j) {
   const q = mpRoom.questions[j];
   const rev = mpRoom.reveal?.[j];
   const my = mpMyAnswers[j];
-  if (!q || !rev) return `<p class="mpSub">Soal tidak tersedia.</p><button class="mpPrimary trvResume" data-mp-rv="resume">\u21A9 Lanjutkan</button>`;
+  if (!q || !rev) return `<p class="mpSub">Soal tidak tersedia.</p><button class="mpPrimary trvResume" data-mp-rv="resume">${svgIcon("return")} Lanjutkan</button>`;
   const ok = my === rev.answer;
   const opts = Object.keys(q.options || {}).sort().map((l) => {
     const cls = ["option", "mpOpt", "mpRvOpt"];
@@ -297,7 +297,7 @@ function mpReviewViewerHtml(j) {
     <div class="mpRvQ">${escapeHtml(q.question || "")}</div>
     ${qImgs}
     <div class="mpRvOpts">${opts}</div>
-    <button class="mpPrimary trvResume" data-mp-rv="resume">\u21A9 Lanjutkan</button>`;
+    <button class="mpPrimary trvResume" data-mp-rv="resume">${svgIcon("return")} Lanjutkan</button>`;
 }
 function mpReviewAct(act, el) {
   if (act === "toggle") mpReviewListOpen = !mpReviewListOpen;

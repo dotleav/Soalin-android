@@ -1,0 +1,173 @@
+/* ── Gelap v2 & Terang v2 ─────────────────────────────────────────────────────
+   Rapi seperti alat kerja, tetap ramah untuk belajar. Font Nunito (bulat, mudah dibaca).
+   Sudut 12px untuk kartu dan opsi, 8px untuk tombol. Tanpa bayangan, gradien, dan glow.
+   Warna ikonik: pensil (biru), marigold (sorotan), mint (benar), koral (salah). */
+@font-face { font-family: "Nunito"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/nunito-400.woff2") format("woff2"); }
+@font-face { font-family: "Nunito"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/nunito-600.woff2") format("woff2"); }
+@font-face { font-family: "Nunito"; font-style: normal; font-weight: 700; font-display: swap; src: url("../fonts/nunito-700.woff2") format("woff2"); }
+
+body.darkv2 {
+  --bg: #161b24; --bg-alt: #111620;
+  --card: #1e2531; --card-soft: #252e3d;
+  --border: #334056; --border-light: #283246;
+  --text: #f2efe7; --text-secondary: #cfd6e2;
+  --muted: #98a3b6; --muted2: #7a869a; --muted3: #56627a;
+  --accent: #8ec5ff; --accent-soft: rgba(142, 197, 255, 0.14); --accent-strong: #b9dcff;
+  --accent2: #ffd46b; --accent2-soft: rgba(255, 212, 107, 0.14);
+  --on-accent: #0f1722;
+  --correct: #7ed6b0; --correct-strong: #7ed6b0; --wrong: #ff9c86; --wrong-strong: #ff9c86;
+  --blue: #8ec5ff; --cbt: #8ec5ff; --cbt-done: #7ed6b0;
+  --tint-correct-text: #c7f1df; --tint-wrong-text: #ffd3c8;
+}
+body.lightv2 {
+  --bg: #fbf7ef; --bg-alt: #f4eee2;
+  --card: #ffffff; --card-soft: #f6f1e6;
+  --border: #e4dccb; --border-light: #eee7d8;
+  --text: #1d2633; --text-secondary: #3b4658;
+  --muted: #6c7689; --muted2: #8a93a3; --muted3: #b5bcc8;
+  --accent: #2d6cdf; --accent-soft: rgba(45, 108, 223, 0.10); --accent-strong: #1f56b8;
+  --accent2: #f2b233; --accent2-soft: rgba(242, 178, 51, 0.18);
+  --on-accent: #ffffff;
+  --correct: #23997a; --correct-strong: #23997a; --wrong: #e0604a; --wrong-strong: #e0604a;
+  --blue: #2d6cdf; --cbt: #2d6cdf; --cbt-done: #23997a;
+  --tint-correct-text: #0f5d48; --tint-wrong-text: #8a2d1f;
+}
+body.darkv2, body.lightv2 {
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --shadow-card: none;
+  color-scheme: light dark;
+  background: var(--bg); background-image: none;
+  font-family: "Nunito", system-ui, sans-serif;
+}
+body.darkv2 { color-scheme: dark; }
+body.lightv2 { color-scheme: light; }
+body.darkv2 *, body.lightv2 * { transition-property: background-color, border-color, color; transition-duration: 120ms; }
+body.darkv2 button:active:not(:disabled), body.lightv2 button:active:not(:disabled) { transform: scale(0.98); }
+
+/* Teks: satu keluarga, kapital tidak dipakai untuk label */
+body.darkv2 h1, body.darkv2 h2, body.darkv2 h3, body.darkv2 .title, body.darkv2 .pkgTitle,
+body.lightv2 h1, body.lightv2 h2, body.lightv2 h3, body.lightv2 .title, body.lightv2 .pkgTitle { font-family: "Nunito", sans-serif; font-weight: 700; letter-spacing: -0.01em; color: var(--text); }
+body.darkv2 h1 .ico, body.lightv2 h1 .ico { color: var(--accent2); width: 1.05em; height: 1.05em; vertical-align: -0.14em; margin-right: 0.12em; }
+body.darkv2 .mono, body.darkv2 .count, body.darkv2 .num, body.darkv2 .qNum,
+body.lightv2 .mono, body.lightv2 .count, body.lightv2 .num, body.lightv2 .qNum { font-family: "Nunito", sans-serif; font-variant-numeric: tabular-nums; font-weight: 700; }
+body.darkv2 .sectionLabel, body.lightv2 .sectionLabel { text-transform: none; letter-spacing: 0; font-size: 0.82rem; font-weight: 700; color: var(--muted); }
+
+/* Isi soal: lega dan mudah dibaca */
+body.darkv2 .qText, body.darkv2 .optText, body.darkv2 .explanation, body.darkv2 .mpQuestion, body.darkv2 .mpRvQ,
+body.lightv2 .qText, body.lightv2 .optText, body.lightv2 .explanation, body.lightv2 .mpQuestion, body.lightv2 .mpRvQ {
+  font-family: "Nunito", sans-serif; font-weight: 600; font-size: 1.08rem; line-height: 1.7; color: var(--text);
+}
+body.darkv2 .qText, body.lightv2 .qText { max-width: 66ch; }
+body.darkv2 .optText, body.lightv2 .optText { font-weight: 600; font-size: 1.02rem; }
+
+/* Permukaan */
+body.darkv2 .headerZone, body.lightv2 .headerZone { background: var(--bg); border-bottom: 1px solid var(--border); }
+body.darkv2 .headerZone::before, body.darkv2 .headerZone::after, body.lightv2 .headerZone::before, body.lightv2 .headerZone::after { content: none; display: none; }
+body.darkv2 .modeBar, body.lightv2 .modeBar { background: var(--bg); border-bottom: 1px solid var(--border); }
+body.darkv2 .progressCard, body.darkv2 .doneBanner, body.darkv2 .timerCard, body.darkv2 .statBox2, body.darkv2 .scoreHero,
+body.darkv2 .qCard, body.darkv2 .categoryGroup, body.darkv2 .settingsCard, body.darkv2 .diffCard, body.darkv2 .mpCard,
+body.darkv2 .packageItem, body.darkv2 .trvBar, body.darkv2 .tag,
+body.lightv2 .progressCard, body.lightv2 .doneBanner, body.lightv2 .timerCard, body.lightv2 .statBox2, body.lightv2 .scoreHero,
+body.lightv2 .qCard, body.lightv2 .categoryGroup, body.lightv2 .settingsCard, body.lightv2 .diffCard, body.lightv2 .mpCard,
+body.lightv2 .packageItem, body.lightv2 .trvBar, body.lightv2 .tag {
+  background: var(--card); background-image: none; box-shadow: none; border: 1px solid var(--border); border-radius: var(--radius-md);
+}
+body.darkv2 .qCard, body.lightv2 .qCard { padding: 22px 24px; }
+body.darkv2 .progressFill, body.lightv2 .progressFill { background: var(--accent2); background-image: none; box-shadow: none; border-radius: 999px; }
+body.darkv2 .progressTrack, body.lightv2 .progressTrack { background: var(--border-light); border-radius: 999px; height: 10px; }
+body.darkv2 .tag, body.lightv2 .tag { border-radius: 999px; font-weight: 700; color: var(--text-secondary); padding: 4px 12px; }
+
+/* Tombol: sudut 8px; aksi utama berwarna aksen */
+body.darkv2 .pillBtn, body.darkv2 .shuffleBtn, body.darkv2 .resetBtn, body.darkv2 .pkgSwitchBtn, body.darkv2 .muteBtn,
+body.darkv2 .hideToggleBtn, body.darkv2 .restartBtn, body.darkv2 .loadMoreBtn, body.darkv2 .trvToggle,
+body.lightv2 .pillBtn, body.lightv2 .shuffleBtn, body.lightv2 .resetBtn, body.lightv2 .pkgSwitchBtn, body.lightv2 .muteBtn,
+body.lightv2 .hideToggleBtn, body.lightv2 .restartBtn, body.lightv2 .loadMoreBtn, body.lightv2 .trvToggle {
+  background: transparent; background-image: none; box-shadow: none; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text-secondary); font-family: "Nunito", sans-serif; font-weight: 700; font-size: 0.86rem;
+}
+body.darkv2 .pillBtn.active, body.lightv2 .pillBtn.active { background: var(--accent-soft); border-color: var(--accent); color: var(--text); }
+body.darkv2 .nextBtn, body.darkv2 .mpPrimary, body.lightv2 .nextBtn, body.lightv2 .mpPrimary {
+  background: var(--accent); background-image: none; box-shadow: none; border: 1px solid var(--accent); border-radius: var(--radius-sm);
+  color: var(--on-accent); font-family: "Nunito", sans-serif; font-weight: 700;
+}
+body.darkv2 .startTentamenBtn, body.darkv2 .mpCreateBtn, body.lightv2 .startTentamenBtn, body.lightv2 .mpCreateBtn {
+  background: var(--accent) !important; color: var(--on-accent); background-image: none; box-shadow: none; border-radius: var(--radius-sm); font-family: "Nunito", sans-serif; font-weight: 800;
+}
+body.darkv2 .themeModeOption.active, body.lightv2 .themeModeOption.active { background: var(--accent-soft); border-color: var(--accent); }
+
+/* Opsi jawaban: lingkaran huruf yang ramah, warna mengikuti hasil */
+body.darkv2 .option, body.lightv2 .option { background: transparent; border: 1.5px solid var(--border); border-radius: var(--radius-md); box-shadow: none; }
+body.darkv2 .option:hover:not(:disabled), body.lightv2 .option:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-soft); }
+body.darkv2 .option .letter, body.lightv2 .option .letter {
+  width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%;
+  border: 2px solid var(--muted2); background: transparent; color: var(--text-secondary); font-weight: 800;
+}
+body.darkv2 .option.selected, body.lightv2 .option.selected { border-color: var(--accent); background: var(--accent-soft); }
+body.darkv2 .option.selected .letter, body.lightv2 .option.selected .letter { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+body.darkv2 .option.correct, body.lightv2 .option.correct { border-color: var(--correct); background: rgba(126, 214, 176, 0.12); }
+body.lightv2 .option.correct { background: rgba(35, 153, 122, 0.10); }
+body.darkv2 .option.correct .letter, body.lightv2 .option.correct .letter { background: var(--correct); border-color: var(--correct); color: #0c1b14; }
+body.darkv2 .option.wrong, body.lightv2 .option.wrong { border-color: var(--wrong); background: rgba(255, 156, 134, 0.12); }
+body.lightv2 .option.wrong { background: rgba(224, 96, 74, 0.10); }
+body.darkv2 .option.wrong .letter, body.lightv2 .option.wrong .letter { background: var(--wrong); border-color: var(--wrong); color: #2a0f08; }
+body.lightv2 .option.wrong .letter { color: #ffffff; }
+body.lightv2 .option.correct .letter { color: #ffffff; }
+
+/* Warna mode (inline) hanya di stiker; antarmuka memakai aksen tema */
+body.darkv2 .cbtWrap, body.lightv2 .cbtWrap { --cbt: var(--accent) !important; --cbt-done: var(--correct) !important; }
+body.darkv2 .modeSticker, body.lightv2 .modeSticker, body.darkv2 .modeTile.active .modeSticker, body.lightv2 .modeTile.active .modeSticker { filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.18)); transform: none; }
+body.darkv2 .modeTile.active .modeCaption, body.lightv2 .modeTile.active .modeCaption { color: var(--accent); }
+body.darkv2 .modeBadge, body.lightv2 .modeBadge { background: var(--accent2); color: #2a1c00; border: 0; box-shadow: none; transform: none; font-weight: 800; }
+
+/* Stiker hasil: sapaan visual sesuai skor, sekali muncul */
+body.darkv2 .resultSticker, body.lightv2 .resultSticker { display: block; width: 150px; height: auto; margin: 0 auto 6px; animation: v2pop 420ms ease-out 1; }
+@keyframes v2pop { 0% { transform: scale(0.82); } 60% { transform: scale(1.06); } 100% { transform: scale(1); } }
+body.darkv2 .gradeLabel, body.lightv2 .gradeLabel { font-weight: 800; font-size: 1.15rem; }
+
+/* Pemilih paket dan kategori */
+body.darkv2 .categoryGroup, body.lightv2 .categoryGroup { overflow: hidden; }
+body.darkv2 .packageItem:hover, body.lightv2 .packageItem:hover { border-color: var(--accent); }
+body.darkv2 .progressCard, body.lightv2 .progressCard { padding: 14px 16px; }
+
+/* Satu keluarga huruf di seluruh tema v2 (tidak bergantung pada font yang diatur komponen lama) */
+body.darkv2 *, body.lightv2 * { font-family: "Nunito", system-ui, sans-serif !important; }
+body.darkv2 .option .letter, body.lightv2 .option .letter { font-size: 0.95rem; line-height: 1; }
+body.darkv2 .trophy, body.lightv2 .trophy { display: none; }
+
+/* Minimal: tombol ikon saja di v2. Teks tetap ada untuk pembaca layar dan tooltip. */
+body.darkv2 .iconBtn .lbl, body.lightv2 .iconBtn .lbl { display: none; }
+body.darkv2 .iconBtn, body.lightv2 .iconBtn { min-width: 38px; min-height: 38px; padding: 0 10px; display: inline-flex; align-items: center; justify-content: center; }
+body.darkv2 .iconBtn svg, body.lightv2 .iconBtn svg { width: 1.2rem; height: 1.2rem; }
+body.darkv2 .shuffleBtn:not(.active), body.lightv2 .shuffleBtn:not(.active) { color: var(--muted2); border-color: var(--border-light); }
+body.darkv2 .shuffleBtn.active, body.lightv2 .shuffleBtn.active { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+
+/* Teks yang tidak dibutuhkan konteksnya disembunyikan di v2 (angka dan ikon tetap tampil) */
+body.darkv2 .v2hide, body.lightv2 .v2hide { display: none; }
+
+/* Header ringkas (HP): judul dan folder sebaris dengan subtitle, angka di kanan */
+body.darkv2 .titleRow, body.lightv2 .titleRow { align-items: flex-start; gap: 12px; }
+body.darkv2 .titleRow > div:first-child, body.lightv2 .titleRow > div:first-child { display: flex; flex-wrap: wrap; align-items: center; column-gap: 10px; min-width: 0; flex: 1 1 auto; }
+body.darkv2 h1.pkgTitleActive, body.lightv2 h1.pkgTitleActive { flex-basis: 100%; font-size: 1.2rem; margin: 0; line-height: 1.25; }
+body.darkv2 .pkgSubtitle, body.lightv2 .pkgSubtitle { margin: 0; font-size: 0.8rem; }
+body.darkv2 .pkgSwitchBtn, body.lightv2 .pkgSwitchBtn { margin: 0; }
+body.darkv2 .tracker .count, body.lightv2 .tracker .count { color: var(--text); font-size: 1.05rem; }
+body.darkv2 .tracker .sub, body.lightv2 .tracker .sub { font-size: 0.85rem; font-weight: 700; }
+/* Progress: cukup bar, angka sudah di header */
+body.darkv2 .progressTop, body.lightv2 .progressTop { display: none; }
+/* Logo: teks tetap di tengah, ikon di kanan teks */
+body.darkv2 .brandH1, body.lightv2 .brandH1 { position: relative; display: inline-block; }
+body.darkv2 .brandMark, body.lightv2 .brandMark { position: absolute; left: 100%; top: 50%; transform: translateY(-50%); margin-left: 0.3em; }
+
+/* Header HP satu baris: folder di samping judul, angka tracker sejajar folder, kategori tidak ditulis */
+body.darkv2 .titleRow, body.lightv2 .titleRow { align-items: center; gap: 10px; }
+body.darkv2 .titleRow > div:first-child, body.lightv2 .titleRow > div:first-child { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1 1 auto; }
+body.darkv2 h1.pkgTitleActive, body.lightv2 h1.pkgTitleActive { flex: 1 1 auto; min-width: 0; margin: 0; font-size: 1.2rem; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.darkv2 .pkgSubtitle, body.lightv2 .pkgSubtitle { display: none; }
+body.darkv2 .pkgSwitchBtn, body.lightv2 .pkgSwitchBtn { flex: none; margin: 0; }
+body.darkv2 .tracker, body.lightv2 .tracker { flex: none; align-self: center; }
+
+/* Satu baris: judul mengambil sisa lebar (tidak membungkus), folder selalu di sampingnya */
+body.darkv2 .titleRow > div:first-child, body.lightv2 .titleRow > div:first-child { flex-wrap: nowrap; }
+body.darkv2 h1.pkgTitleActive, body.lightv2 h1.pkgTitleActive { flex: 1 1 0; }
+
+/* Tracker sejajar folder: satu baris, tidak membungkus */
+body.darkv2 .titleRow, body.lightv2 .titleRow { display: flex; flex-wrap: nowrap; justify-content: space-between; }

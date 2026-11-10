@@ -35,6 +35,7 @@ function render() {
   app.innerHTML = html;
   window.scrollTo(0, prevScrollY);
   attachHandlers();
+  fitPkgTitle();
   if (theme === "p5") requestAnimationFrame(p5ApplyRansom);
 }
 

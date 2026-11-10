@@ -403,7 +403,7 @@
     z-index: 1;
   }
   body.p5 .packageItem.active .pkgTitle::before {
-    content: "▶  ";
+    content: ""; display: inline-block; border-left: 7px solid currentColor; border-top: 5px solid transparent; border-bottom: 5px solid transparent; margin-right: 0.5em; vertical-align: 0.05em;
     color: inherit;
   }
 

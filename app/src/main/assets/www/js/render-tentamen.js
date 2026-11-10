@@ -16,7 +16,7 @@ function renderTentamenSetup() {
   // diberi lencana "Tentamen" di pojok kanan atas. Bekicot & CBT bukan Tentamen.
   let html = `<div class="quiz-fade-in">`;
   html += `<div>
-    <div class="sectionLabel">Pilih mode</div>
+    <div class="sectionLabel v2hide">Pilih mode</div>
     <div class="modeGrid">`;
   Object.keys(DIFFICULTY_CONFIG).forEach(d => {
     html += modeTileHtml(d, tentamenDifficulty === d);
@@ -35,7 +35,7 @@ function renderTentamenSetup() {
   if (cbt) html += renderCbtTimeBar();
 
   html += `<button class="startTentamenBtn" id="startTentamenBtn" style="background:${cfg.color};" ${qCount === 0 ? "disabled" : ""}>
-    \u25B6 Mulai <img class="startSticker" src="${cfg.sticker}" alt="" aria-hidden="true">
+    ${svgIcon("play")} Mulai <img class="startSticker" src="${cfg.sticker}" alt="" aria-hidden="true">
   </button>`;
   html += `</div>`;
   return html;
@@ -78,7 +78,7 @@ function renderTentamenRunning() {
   html += `<div class="timerCard${isUrgent ? " urgent" : ""}${isTimeout ? " timeoutFlash" : ""}" id="timerCard">
     <div class="timerTop">
       <div class="timerLabel${isUrgent ? " urgent" : ""}" id="timerLabel">
-        \u23F1 ${tentamenDifficulty === "bekicot" ? "No timer \uD83D\uDC0C" : isAnswering ? "Waktu tersisa" : isTimeout ? "Waktu habis!" : "Selesai"}
+        ${svgIcon("timer")} ${tentamenDifficulty === "bekicot" ? "No timer" : isAnswering ? "Waktu tersisa" : isTimeout ? "Waktu habis!" : "Selesai"}
       </div>
       <span class="timerNum${isUrgent ? " pulse" : ""}" id="timerNum" style="color:${isUrgent ? "var(--wrong-strong)" : cfg.color};">
         ${tentamenDifficulty === "bekicot" ? "\u221E" : String(isAnswering ? timeLeft : isTimeout ? 0 : timeLeft).padStart(2, "0")}
@@ -97,17 +97,17 @@ function renderTentamenRunning() {
   }
 
   if (isTimeout) {
-    html += `<div class="timeoutNotice">\u26A0\uFE0F <span>Waktu habis! Soal ini dihitung terlewati. Melanjutkan\u2026</span></div>`;
+    html += `<div class="timeoutNotice">${svgIcon("warning")} <span>Waktu habis! Soal ini dihitung terlewati. Melanjutkan…</span></div>`;
   }
 
   if (viewing !== null) {
-    html += `<button class="nextBtn trvResume" id="tentamenResumeBtn">\u21A9 Lanjutkan Kuis</button>`;
+    html += `<button class="nextBtn trvResume iconBtn" id="tentamenResumeBtn" title="Lanjutkan kuis" aria-label="Lanjutkan kuis">${svgIcon("return")} <span class="lbl">Lanjutkan Kuis</span></button>`;
   } else {
     html += tentamenReviewBarHtml();
   }
 
   if (isManual && viewing === null) {
-    html += `<button class="nextBtn" id="nextTentamenBtn">${qNum < total ? "\u2794 Soal Berikutnya" : "\uD83C\uDFC6 Lihat Hasil"}</button>`;
+    html += `<button class="nextBtn" id="nextTentamenBtn">${qNum < total ? `${svgIcon("chevron-right")} Berikutnya` : `${svgIcon("award")} Lihat Hasil`}</button>`;
   }
 
   html += `</div>`;
@@ -136,7 +136,8 @@ function renderTentamenResults() {
 
   html += `
     <div class="scoreHero">
-      <div class="trophy">\uD83C\uDFC6</div>
+      <img class="resultSticker" src="${resultStickerSrc(pct)}" alt="">
+      <div class="trophy">${svgIcon("award")}</div>
       <div class="pct" style="color:${gradeColor};">${pct}%</div>
       <div class="gradeLabel" style="color:${gradeColor};">${gradeLabel}</div>
       <div class="subline">${correct} dari ${total} soal benar</div>
@@ -167,7 +168,7 @@ function renderTentamenResults() {
     </div>
   `;
 
-  html += `<button class="restartBtn" id="restartTentamenBtn">\u21BA Ulangi</button>`;
+  html += `<button class="restartBtn iconBtn" id="restartTentamenBtn" title="Ulangi" aria-label="Ulangi">${svgIcon("reset")} <span class="lbl">Ulangi</span></button>`;
 
   html += `<div class="reviewLabel">Detail jawaban:</div>`;
   html += `<div class="reviewList">`;
@@ -213,14 +214,14 @@ function tentamenReviewBarHtml() {
   if (!tentamenReviewAllowed()) return "";
   const solved = tentamenSolvedBefore();
   if (!solved.length) return "";
-  let html = `<div class="trvBar"><button class="trvToggle${tentamenReviewListOpen ? " open" : ""}" id="tentamenReviewToggle" aria-expanded="${tentamenReviewListOpen}">\uD83D\uDCCB Soal sebelumnya <span class="mono">(${solved.length})</span></button></div>`;
+  let html = `<div class="trvBar"><button class="trvToggle iconBtn${tentamenReviewListOpen ? " open" : ""}" id="tentamenReviewToggle" title="Soal sebelumnya" aria-label="Soal sebelumnya" aria-expanded="${tentamenReviewListOpen}">${svgIcon("list")} <span class="lbl">Soal sebelumnya</span> <span class="mono">(${solved.length})</span></button></div>`;
   if (tentamenReviewListOpen) {
     html += `<div class="trvList">`;
     for (const i of solved) {
       const q = tentamenQuestions[i];
       const ok = tentamenIsCorrect(i);
       const snippet = String(q.question || "").replace(/\s+/g, " ").slice(0, 80);
-      html += `<button class="trvItem ${ok ? "ok" : "bad"}" data-review-idx="${i}"><span class="trvNum mono">${i + 1}</span><span class="trvText">${escapeHtml(snippet)}</span><span class="trvChip">${ok ? "\u2713 Benar" : "\u2717 Salah"}</span></button>`;
+      html += `<button class="trvItem ${ok ? "ok" : "bad"}" data-review-idx="${i}"><span class="trvNum mono">${i + 1}</span><span class="trvText">${escapeHtml(snippet)}</span><span class="trvChip">${ok ? svgIcon("check") + " Benar" : svgIcon("close") + " Salah"}</span></button>`;
     }
     html += `</div>`;
   }

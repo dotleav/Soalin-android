@@ -20,7 +20,7 @@
     closeZoom();
     layer = document.createElement("div");
     layer.className = "imgZoom";
-    layer.innerHTML = '<button type="button" class="imgZoomClose" aria-label="Tutup">\u2715</button>';
+    layer.innerHTML = '<button type="button" class="imgZoomClose" aria-label="Tutup">' + svgIcon("close") + '</button>';
     const img = document.createElement("img");
     img.className = "imgZoomImg";
     img.alt = "gambar opsi";

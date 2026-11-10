@@ -176,19 +176,19 @@ function renderAnswertoneCard() {
             <select class="atTrigger" data-at-trigger="${id}" aria-label="Keluar saat">
               ${ANSWERTONE_TRIGGERS.map((t) => `<option value="${t.value}"${cfg.trigger === t.value ? " selected" : ""}>${t.label}</option>`).join("")}
             </select>
-            <button class="atBtn" data-at-play="${id}" aria-label="Putar contoh ${answertoneAttr(s.name)}">\u25B6</button>
-            ${s.custom ? `<button class="atBtn atDel" data-at-del="${id}" aria-label="Hapus ${answertoneAttr(s.name)}">\u2715</button>` : ""}
+            <button class="atBtn" data-at-play="${id}" aria-label="Putar contoh ${answertoneAttr(s.name)}">${svgIcon("play")}</button>
+            ${s.custom ? `<button class="atBtn atDel" data-at-del="${id}" aria-label="Hapus ${answertoneAttr(s.name)}">${svgIcon("close")}</button>` : ""}
           </div>`;
   }).join("");
   return `
       <div class="atWrap" id="answertoneCard">
         <div class="settingsRow atHead">
           <div class="settingsRowText">
-            <span class="settingsRowTitle">\uD83C\uDFB5 Answertone</span>
+            <span class="settingsRowTitle">${svgIcon("music")} Answertone</span>
             <span class="settingsRowDesc">Suara yang hanya keluar saat jawaban terjawab. Aktif: ${onCount} dari ${items.length}.</span>
           </div>
           <button class="themeModeToggle" id="atToggleBtn" aria-expanded="${answertoneOpen}" aria-label="Buka daftar Answertone">
-            <span class="themeModeChevron${answertoneOpen ? " open" : ""}">\u25BE</span>
+            <span class="themeModeChevron${answertoneOpen ? " open" : ""}">${svgIcon("chevron-down")}</span>
           </button>
         </div>
         ${answertoneOpen ? `

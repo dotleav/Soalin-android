@@ -518,7 +518,7 @@
   .packageItem:hover { background: var(--border-light); }
   .packageItem.active { background: var(--accent-soft); }
   .packageItem .pkgTitle { font-weight: 700; font-size: 0.87rem; color: var(--text); }
-  .packageItem.active .pkgTitle::before { content: "\2713  "; color: var(--accent); }
+  .packageItem.active .pkgTitle::before { content: ""; display: inline-block; width: 0.9em; height: 0.9em; margin-right: 0.4em; vertical-align: -0.1em; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4.5 12.5l4.5 4.5L19.5 7.5' fill='none'/%3E%3C/svg%3E") center / contain no-repeat; color: var(--accent); }
   .packageItem .pkgMeta { color: var(--muted2); font-size: 0.7rem; }
 
   .pickerCloseBtn {

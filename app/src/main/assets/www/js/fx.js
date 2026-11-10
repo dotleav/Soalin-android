@@ -118,20 +118,20 @@ function playSound(correct) {
     const sxfNotifEl = document.getElementById("sxfNotif");
     if (sxfNotifEl) {
       const SXF_CORRECT_VARIANTS = [
-        { img: "./images/theme/sxf/donebanner.png", text: "✦ WAKU WAKU! ⭐", cls: "sxfV-anya" },
-        { img: "./images/theme/sxf/donebanner.png", text: "Anya senang! 🌟", cls: "sxfV-anya" },
-        { img: "./images/theme/sxf/option-correct.png", text: "Bond setuju! 🐾", cls: "sxfV-bond" },
-        { img: "./images/theme/sxf/donebanner.png", text: "Anya bangga! 💪", cls: "sxfV-anya" },
-        { img: "./images/theme/sxf/category-catname.png", text: "Becky terkesan! ✨", cls: "sxfV-becky" },
-        { img: "./images/theme/sxf/donebanner.png", text: "Hebat! anya tahu! 🎉", cls: "sxfV-anya" },
+        { img: "./images/theme/sxf/donebanner.png", text: "WAKU WAKU!", icon: "sparkle", cls: "sxfV-anya" },
+        { img: "./images/theme/sxf/donebanner.png", text: "Anya senang!", icon: "star", cls: "sxfV-anya" },
+        { img: "./images/theme/sxf/option-correct.png", text: "Bond setuju!", icon: "paw", cls: "sxfV-bond" },
+        { img: "./images/theme/sxf/donebanner.png", text: "Anya bangga!", icon: "star", cls: "sxfV-anya" },
+        { img: "./images/theme/sxf/category-catname.png", text: "Becky terkesan!", icon: "sparkle", cls: "sxfV-becky" },
+        { img: "./images/theme/sxf/donebanner.png", text: "Hebat! anya tahu!", icon: "star", cls: "sxfV-anya" },
       ];
       const SXF_WRONG_VARIANTS = [
-        { img: "./images/theme/sxf/notif-anya-sad.png", text: "Anya sedih... 😢", cls: "sxfV-anya" },
-        { img: "./images/theme/sxf/sectionlabel.png", text: "Yor kecewa... 😤", cls: "sxfV-yor" },
-        { img: "./images/theme/sxf/notif-anya-sad.png", text: "Heh? salah ya? 😅", cls: "sxfV-anya" },
-        { img: "./images/theme/sxf/sectionlabel.png", text: "Yor tidak setuju! ⚔️", cls: "sxfV-yor" },
-        { img: "./images/theme/sxf/notif-anya-sad.png", text: "Anya kaget! 😱", cls: "sxfV-anya" },
-        { img: "./images/theme/sxf/option-correct.png", text: "Bond geleng kepala 🐶", cls: "sxfV-bond" },
+        { img: "./images/theme/sxf/notif-anya-sad.png", text: "Anya sedih...", icon: "heart", cls: "sxfV-anya" },
+        { img: "./images/theme/sxf/sectionlabel.png", text: "Yor kecewa...", icon: "sword", cls: "sxfV-yor" },
+        { img: "./images/theme/sxf/notif-anya-sad.png", text: "Heh? salah ya?", icon: "heart", cls: "sxfV-anya" },
+        { img: "./images/theme/sxf/sectionlabel.png", text: "Yor tidak setuju!", icon: "sword", cls: "sxfV-yor" },
+        { img: "./images/theme/sxf/notif-anya-sad.png", text: "Anya kaget!", icon: "sparkle", cls: "sxfV-anya" },
+        { img: "./images/theme/sxf/option-correct.png", text: "Bond geleng kepala", icon: "paw", cls: "sxfV-bond" },
       ];
       const pool = correct ? SXF_CORRECT_VARIANTS : SXF_WRONG_VARIANTS;
       const lastIdx = sxfNotifEl._lastIdx ?? -1;
@@ -143,7 +143,7 @@ function playSound(correct) {
       const imgEl = sxfNotifEl.querySelector(".sxfNotifAnya");
       const txtEl = sxfNotifEl.querySelector(".sxfNotifText");
       if (imgEl) imgEl.src = v.img;
-      if (txtEl) txtEl.textContent = v.text;
+      if (txtEl) txtEl.innerHTML = (v.icon ? svgIcon(v.icon) + " " : "") + escapeHtml(v.text);
       // Clear old variant classes
       sxfNotifEl.classList.remove("sxfV-anya","sxfV-bond","sxfV-yor","sxfV-becky");
       sxfNotifEl.className = "sxfNotif " + (correct ? "sxfCorrect" : "sxfWrong") + " " + v.cls;
@@ -193,7 +193,7 @@ function setVolume(v) {
 }
 
 // ── Tema (dark/light/p5) ──────────────────────────────────────────────────
-const THEME_VALUES = ["dark", "light", "p5", "sxf", "doksli", "koceng", "capy"];
+const THEME_VALUES = ["dark", "light", "p5", "sxf", "doksli", "koceng", "capy", "darkv2", "lightv2"];
 let theme = THEME_VALUES.includes(localStorage.getItem(THEME_KEY)) ? localStorage.getItem(THEME_KEY) : "dark";
 function setTheme(t) {
   theme = THEME_VALUES.includes(t) ? t : "dark";
@@ -206,6 +206,8 @@ function syncThemeClass() {
   document.body.classList.toggle("doksli", theme === "doksli");
   document.body.classList.toggle("koceng", theme === "koceng");
   document.body.classList.toggle("capy", theme === "capy");
+  document.body.classList.toggle("darkv2", theme === "darkv2");
+  document.body.classList.toggle("lightv2", theme === "lightv2");
 }
 
 // ── P5 Mode: Ransom/cutout letter effect ──────────────────────────────────

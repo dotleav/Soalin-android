@@ -13,7 +13,7 @@ function renderBrokenDeck(list) {
 
   const revealHtml = open ? `
     <div class="brokenReveal">
-      <div class="tag">\uD83D\uDCA1 Penjelasan</div>
+      <div class="tag">${svgIcon("bulb")} Penjelasan</div>
       ${q.explanation ? `<p class="brokenExp">${escapeHtml(q.explanation)}</p>` : ""}
       ${eImgs.map(src => `<img class="exImg" src="${src}" alt="gambar penjelasan">`).join("")}
       ${hasExp ? "" : `<p class="noImg">(belum ada penjelasan di dokumen ini)</p>`}
@@ -23,8 +23,8 @@ function renderBrokenDeck(list) {
     <div class="brokenDeck">
       <div class="brokenCard" data-broken-id="${escapeAttr(q.id)}">
         <div class="brokenMeta">
-          <span class="brokenBadge">\u26A0\uFE0F Soal Rusak</span>
-          <span class="tapHint">${open ? "\uD83D\uDC46 Tap lagi untuk tutup" : "\uD83D\uDC46 Tap untuk lihat penjelasan"}</span>
+          <span class="brokenBadge">${svgIcon("warning")} Soal Rusak</span>
+          <span class="tapHint">${open ? svgIcon("chevron-up") + " Tap lagi untuk tutup" : svgIcon("chevron-down") + " Tap untuk lihat penjelasan"}</span>
           <span class="brokenCount">${brokenIdx + 1} / ${n}</span>
         </div>
         <p class="brokenQ">${escapeHtml(q.question)}</p>
@@ -32,8 +32,8 @@ function renderBrokenDeck(list) {
         ${revealHtml}
       </div>
       <div class="brokenNav">
-        <button data-broken-nav="-1" ${brokenIdx === 0 ? "disabled" : ""}>\u2190 Sebelumnya</button>
-        <button data-broken-nav="1" ${brokenIdx === n - 1 ? "disabled" : ""}>Berikutnya \u2192</button>
+        <button data-broken-nav="-1" ${brokenIdx === 0 ? "disabled" : ""}>${svgIcon("chevron-left")} Sebelumnya</button>
+        <button data-broken-nav="1" ${brokenIdx === n - 1 ? "disabled" : ""}>Berikutnya ${svgIcon("chevron-right")}</button>
       </div>
     </div>
   `;
@@ -52,9 +52,9 @@ function renderIsianCard(q, qNum, answeredValue) {
   if (isSkipped) {
     bodyHtml = `
       <div class="isianReveal">
-        <div class="skipNote">⏭️ Soal ini dilewati${cbtActive() ? " (belum dijawab)" : " (waktu habis)"}</div>
+        <div class="skipNote">${svgIcon("skip")} Soal ini dilewati${cbtActive() ? " (belum dijawab)" : " (waktu habis)"}</div>
         <div class="explanation">
-          <div class="tag">🔑 Kunci Jawaban</div>
+          <div class="tag">${svgIcon("key")} Kunci Jawaban</div>
           <p>${escapeHtml(q.answer || "(tidak ada kunci jawaban)")}</p>
         </div>
       </div>
@@ -63,11 +63,11 @@ function renderIsianCard(q, qNum, answeredValue) {
     bodyHtml = `
       <div class="isianReveal">
         <div class="isianYourAnswer">
-          <div class="tag">✍️ Jawaban kamu <span class="icon ok">✓</span> <span class="isianCorrectLabel">Benar</span></div>
+          <div class="tag">${svgIcon("pen")} Jawaban kamu <span class="icon ok">${svgIcon("check")}</span> <span class="isianCorrectLabel">Benar</span></div>
           <p>${escapeHtml(answeredValue)}</p>
         </div>
         <div class="explanation">
-          <div class="tag">🔑 Kunci Jawaban</div>
+          <div class="tag">${svgIcon("key")} Kunci Jawaban</div>
           <p>${escapeHtml(q.answer || "(tidak ada kunci jawaban)")}</p>
         </div>
       </div>
@@ -76,7 +76,7 @@ function renderIsianCard(q, qNum, answeredValue) {
     bodyHtml = `
       <div class="isianInputRow">
         <textarea class="isianInput" data-qid="${escapeAttr(q.id)}" rows="2" placeholder="Ketik jawabanmu di sini…"></textarea>
-        <button class="isianSubmitBtn" data-qid="${escapeAttr(q.id)}" title="Kirim jawaban" aria-label="Kirim jawaban">▶</button>
+        <button class="isianSubmitBtn" data-qid="${escapeAttr(q.id)}" title="Kirim jawaban" aria-label="Kirim jawaban">${svgIcon("chevron-right")}</button>
       </div>
     `;
   }
@@ -84,9 +84,9 @@ function renderIsianCard(q, qNum, answeredValue) {
   return `
     <div class="qCard isianCard">
       <div class="qMeta">
-        <span class="isianBadge">✍️ Isian</span>
-        ${(q.questionImages || []).length > 0 ? `<span class="imgBadge">🖼️ Bergambar</span>` : ""}
-        ${isAnswered ? `<span class="tapHint">✅ Sudah dijawab</span>` : ""}
+        <span class="isianBadge">${svgIcon("pen")} Isian</span>
+        ${(q.questionImages || []).length > 0 ? `<span class="imgBadge">${svgIcon("image")} Bergambar</span>` : ""}
+        ${isAnswered ? `<span class="tapHint">${svgIcon("check")} Sudah dijawab</span>` : ""}
       </div>
       <p class="qText"><span class="qNum mono">${qNum}.</span>${escapeHtml(q.question)}</p>
       ${(q.questionImages || []).map(src => `<img class="qImg" src="${src}" alt="gambar soal">`).join("")}
@@ -120,12 +120,12 @@ function renderQuestionCard(q, qNum, chosen, revealAnswer, opts = {}) {
     } else {
       if (letter === q.answer) {
         cls += " correct"; letterCls += " correct";
-        if (chosen === letter) icon = `<span class="icon ok">\u2713</span>`;
+        if (chosen === letter) icon = `<span class="icon ok">${svgIcon("check")}</span>`;
       } else if (letter === chosen) {
         cls += " wrong"; letterCls += " wrong";
         icon = theme === "p5"
           ? `<span class="icon no"><img src="./images/theme/p5/icon-no.png" alt="salah" style="width:14px;height:14px;vertical-align:middle;"></span>`
-          : `<span class="icon no">\u2715</span>`;
+          : `<span class="icon no">${svgIcon("close")}</span>`;
       } else {
         cls += " faded"; letterCls += " faded";
       }
@@ -133,8 +133,8 @@ function renderQuestionCard(q, qNum, chosen, revealAnswer, opts = {}) {
 
     // Penjelasan per opsi: hanya tampil setelah jawab, dan hanya kalau memang ada.
     let expTag = "";
-    if (letter === q.answer) expTag = `<span class="optExpTag ok">\u2713 Jawaban yang benar</span>`;
-    else if (letter === chosen) expTag = `<span class="optExpTag no">\u2715 Kurang tepat</span>`;
+    if (letter === q.answer) expTag = `<span class="optExpTag ok">${svgIcon("check")} Jawaban yang benar</span>`;
+    else if (letter === chosen) expTag = `<span class="optExpTag no">${svgIcon("close")} Kurang tepat</span>`;
     const expHtml = (showState && oExp[letter]) ? `<span class="optExp">${expTag}${escapeHtml(oExp[letter])}</span>` : "";
 
     return `
@@ -151,14 +151,14 @@ function renderQuestionCard(q, qNum, chosen, revealAnswer, opts = {}) {
   }).join("");
 
   const skipNoteHtml = (showState && chosen === "skipped")
-    ? `<div class="skipNote">\u23ED\uFE0F Soal ini dilewati${cbtActive() ? " (belum dijawab)" : " (waktu habis)"}</div>`
+    ? `<div class="skipNote">${svgIcon("skip")} Soal ini dilewati${cbtActive() ? " (belum dijawab)" : " (waktu habis)"}</div>`
     : "";
 
   // Card Gambar Penjelasan: teks opsional, utamanya gambar. Tidak tampil kalau kosong.
   const hasGambarPenj = !!q.explanation || (q.explanationImages || []).length > 0;
   const explanationHtml = (showState && hasGambarPenj) ? `
     <div class="explanation">
-      <div class="tag">\uD83D\uDDBC\uFE0F Gambar Penjelasan</div>
+      <div class="tag">${svgIcon("image")} Gambar Penjelasan</div>
       ${q.explanation ? `<p>${escapeHtml(q.explanation)}</p>` : ""}
       ${(q.explanationImages || []).map(src => `<img class="exImg" src="${src}" alt="gambar penjelasan">`).join("")}
     </div>
@@ -167,7 +167,7 @@ function renderQuestionCard(q, qNum, chosen, revealAnswer, opts = {}) {
   return `
     <div class="qCard">
       <div class="qMeta">
-        ${(q.questionImages || []).length > 0 ? `<span class="imgBadge">\uD83D\uDDBC\uFE0F Bergambar</span>` : ""}
+        ${(q.questionImages || []).length > 0 ? `<span class="imgBadge">${svgIcon("image")} Bergambar</span>` : ""}
       </div>
       <p class="qText"><span class="qNum mono">${qNum}.</span>${escapeHtml(q.question)}</p>
       ${(q.questionImages || []).map(src => `<img class="qImg" src="${src}" alt="gambar soal">`).join("")}

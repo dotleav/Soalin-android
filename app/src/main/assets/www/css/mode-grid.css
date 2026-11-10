@@ -167,3 +167,10 @@ body.sxf .cbtNum.current { box-shadow: 0 0 0 3px #fff, 0 0 0 5px #e8557a; }
 
 /* ── Catatan kecil di tile (pacing per soal di pemilih Multiplayer) ── */
 .modeNote { font-family: "JetBrains Mono", monospace; font-size: 0.7rem; font-weight: 700; color: var(--mc); }
+
+/* Stiker hasil: hanya tampil di tema v2 (lihat theme-v2.css) */
+.resultSticker { display: none; }
+
+/* Tracker: angka benar/salah berwarna sesuai tema; logo picker */
+.tracker .sub .bad { color: var(--wrong); font-weight: 700; }
+.brandMark { display: inline-block; vertical-align: -0.12em; margin-left: 0.3em; }

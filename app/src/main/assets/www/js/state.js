@@ -169,11 +169,11 @@ async function loadCustom() {
 async function handleDocx(fileList) {
   const files = [...fileList].filter((f) => /\.(docx|pdf)$/i.test(f.name));
   pickerOpen = true; // pesan (proses/gagal) harus kelihatan walau lagi di tengah kuis
-  if (!files.length) { dropMsg = "⚠️ Pilih file Word (.docx) atau PDF (.pdf)."; render(); return; }
+  if (!files.length) { dropMsg = "[warn] Pilih file Word (.docx) atau PDF (.pdf)."; render(); return; }
   const msgs = [];
   let last = null;
   for (const file of files) {
-    dropMsg = [...msgs, `⏳ Mengonversi ${file.name}…`].join("\n");
+    dropMsg = [...msgs, `[wait] Mengonversi ${file.name}…`].join("\n");
     render();
     try {
       const { questions, blobs, stats } = await convertDocx(await file.arrayBuffer());
@@ -184,17 +184,17 @@ async function handleDocx(fileList) {
       customQuizzes.unshift({ ...rec, key: "cq:" + rec.id });
       clearCustomProgress(rec.id);
       last = rec;
-      const skipped = stats.skippedExt.length ? ` ⚠️ gambar .${stats.skippedExt.join(", .")} dilewati (browser tidak bisa menampilkan)` : "";
-      msgs.push(`✅ ${file.name}: ${stats.normal} soal${stats.rusak ? ` + ${stats.rusak} soal rusak` : ""}${stats.isian ? ` + ${stats.isian} soal isian` : ""}, ${stats.images} gambar${skipped}${saved ? "" : " ⚠️ tidak tersimpan (IndexedDB)"}`);
+      const skipped = stats.skippedExt.length ? ` [warn] gambar .${stats.skippedExt.join(", .")} dilewati (browser tidak bisa menampilkan)` : "";
+      msgs.push(`[ok] ${file.name}: ${stats.normal} soal${stats.rusak ? ` + ${stats.rusak} soal rusak` : ""}${stats.isian ? ` + ${stats.isian} soal isian` : ""}, ${stats.images} gambar${skipped}${saved ? "" : " [warn] tidak tersimpan (IndexedDB)"}`);
     } catch (e) {
-      msgs.push(`❌ ${file.name}: ${e instanceof ReferenceError ? "Browser terlalu lama (butuh DecompressionStream). Pakai Chrome/Edge/Firefox/Safari terbaru." : e.message}`);
+      msgs.push(`[err] ${file.name}: ${e instanceof ReferenceError ? "Browser terlalu lama (butuh DecompressionStream). Pakai Chrome/Edge/Firefox/Safari terbaru." : e.message}`);
     }
   }
   dropMsg = msgs.join("\n");
   // Satu file yang sukses langsung dimainkan; banyak file → tetap di pemilih paket.
   if (files.length === 1 && last) {
     await selectPackage(customPkg(last));
-    pickerOpen = msgs[0].includes("⚠️");
+    pickerOpen = msgs[0].includes("[warn]");
   }
   render();
 }
@@ -212,7 +212,7 @@ async function deleteCustom(recId) {
     try { localStorage.removeItem(ACTIVE_PKG_KEY); } catch { /* noop */ }
     resetQuizStateForNewPackage();
   }
-  dropMsg = "🗑️ Kuis custom dihapus.";
+  dropMsg = "[del] Kuis custom dihapus.";
   pickerOpen = true;
   render();
 }

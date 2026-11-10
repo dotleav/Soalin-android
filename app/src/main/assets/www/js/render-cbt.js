@@ -117,15 +117,15 @@ function renderCbtRunning() {
     </div>
     <div class="cbtTrack"><div class="cbtTrackFill" id="cbtTrackFill" style="width:${pct}%;"></div></div>`;
   if (cbtExpired) {
-    html += `<div class="timeoutNotice">\u26A0\uFE0F <span>Waktu paket habis. Jawaban dikunci, tekan Submit untuk melihat nilai.</span></div>`;
+    html += `<div class="timeoutNotice">${svgIcon("warning")} <span>Waktu paket habis. Jawaban dikunci, tekan Submit untuk melihat nilai.</span></div>`;
   }
   html += `<div id="cbtCard">${card}</div>`;
   html += `
     <div class="cbtNavRow">
-      <button class="cbtArrow" id="cbtPrevBtn" ${currentIdx === 0 ? "disabled" : ""}>\u2190 Sebelumnya</button>
-      <button class="cbtArrow" id="cbtNextBtn" ${currentIdx >= total - 1 ? "disabled" : ""}>Berikutnya \u2192</button>
+      <button class="cbtArrow iconBtn" id="cbtPrevBtn" aria-label="Sebelumnya" title="Sebelumnya" ${currentIdx === 0 ? "disabled" : ""}>${svgIcon("chevron-left")} <span class="lbl">Sebelumnya</span></button>
+      <button class="cbtArrow iconBtn" id="cbtNextBtn" aria-label="Berikutnya" title="Berikutnya" ${currentIdx >= total - 1 ? "disabled" : ""}><span class="lbl">Berikutnya</span> ${svgIcon("chevron-right")}</button>
     </div>
-    <div class="cbtGridHead"><span>Daftar soal</span><span class="mono" id="cbtCountText">${cbtAnsweredCount()}/${total} dijawab</span></div>
+    <div class="cbtGridHead"><span class="v2hide">Daftar soal</span><span class="mono" id="cbtCountText">${cbtAnsweredCount()}/${total}<span class="v2hide"> dijawab</span></span></div>
     <div class="cbtGrid" id="cbtGrid">`;
   for (let i = 0; i < total; i++) {
     const cls = (cbtIsAnswered(i) ? " done" : "") + (i === currentIdx ? " current" : "");
@@ -140,7 +140,7 @@ function cbtSubmitSlotHtml() {
   if (!cbtCanSubmit()) {
     return `<p class="cbtHint">Selesaikan soal terakhir (${tentamenQuestions.length}) untuk membuka tombol Submit. Jawaban boleh diganti kapan saja sebelum Submit.</p>`;
   }
-  return `<button class="startTentamenBtn cbtSubmitBtn" id="cbtSubmitBtn" style="background:${DIFFICULTY_CONFIG.cbt.color};">\u2705 Submit &amp; Lihat Nilai</button>`;
+  return `<button class="startTentamenBtn cbtSubmitBtn" id="cbtSubmitBtn" style="background:${DIFFICULTY_CONFIG.cbt.color};">${svgIcon("check")} Submit</button>`;
 }
 function renderCbtIsianCard(q, qNum, value, disabled) {
   const v = value && value !== "skipped" ? String(value) : "";
@@ -148,8 +148,8 @@ function renderCbtIsianCard(q, qNum, value, disabled) {
   return `
     <div class="qCard isianCard">
       <div class="qMeta">
-        <span class="isianBadge">\u270D\uFE0F Isian</span>
-        ${imgs.length > 0 ? `<span class="imgBadge">\uD83D\uDDBC\uFE0F Bergambar</span>` : ""}
+        <span class="isianBadge">${svgIcon("pen")} Isian</span>
+        ${imgs.length > 0 ? `<span class="imgBadge">${svgIcon("image")} Bergambar</span>` : ""}
       </div>
       <p class="qText"><span class="qNum mono">${qNum}.</span>${escapeHtml(q.question)}</p>
       ${imgs.map(src => `<img class="qImg" src="${src}" alt="gambar soal">`).join("")}
@@ -286,3 +286,21 @@ function modeTileHtml(k, active, attrs = "", note = "") {
       ${note}
     </button>`;
 }
+
+// Stiker hasil sesuai skor (dipakai layar hasil; tampil penuh di tema v2).
+function resultStickerSrc(pct) {
+  const k = pct >= 80 ? "cheetah" : pct >= 60 ? "normal" : pct >= 40 ? "folivora" : "bekicot";
+  return DIFFICULTY_CONFIG[k].sticker;
+}
+
+// Judul paket: ukuran huruf dikecilkan sampai muat satu baris (11-20px), semua tema.
+function fitPkgTitle() {
+  const h = document.querySelector("h1.pkgTitleActive");
+  if (!h) return;
+  h.style.fontSize = "";
+  let px = Math.min(parseFloat(getComputedStyle(h).fontSize), 20);
+  h.style.fontSize = px + "px";
+  while (h.scrollWidth > h.clientWidth && px - 0.5 >= 11) { px -= 0.5; h.style.fontSize = px + "px"; }
+}
+window.addEventListener("resize", fitPkgTitle);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitPkgTitle);

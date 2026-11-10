@@ -7,12 +7,14 @@ function formatDateShort(iso) {
 
 // ── Render: kartu Pengaturan (tema + volume) — tampil di bawah daftar kategori ──
 const THEME_OPTIONS = [
-  { value: "light", icon: "\u2600\uFE0F", label: "Terang" },
-  { value: "dark", icon: "\uD83C\uDF19", label: "Gelap" },
+  { value: "light", icon: svgIcon("sun"), label: "Terang" },
+  { value: "dark", icon: svgIcon("moon"), label: "Gelap" },
+  { value: "darkv2", icon: svgIcon("bulb"), label: "Gelap v2" },
+  { value: "lightv2", icon: svgIcon("star"), label: "Terang v2" },
   { value: "p5", icon: '<img src="./favicon.ico" style="width:16px;height:16px;vertical-align:middle;image-rendering:pixelated;">', label: "Persona 5" },
-  { value: "doksli", icon: '🙏', label: "Dokumen Asli (Doksli)" },
-  { value: "koceng", icon: '🐱', label: "Koceng" },
-  { value: "capy", icon: '🦫', label: "Capy Masbro" },
+  { value: "doksli", icon: svgIcon("document"), label: "Dokumen Asli (Doksli)" },
+  { value: "koceng", icon: svgIcon("paw"), label: "Koceng" },
+  { value: "capy", icon: svgIcon("leaf"), label: "Capy Masbro" },
   { value: "sxf", icon: '<img src="./images/theme/sxf/notif-anya.png" style="width:18px;height:18px;vertical-align:middle;border-radius:50%;">', label: "Spy x Family" },
 ];
 function renderSettingsCard() {
@@ -20,11 +22,11 @@ function renderSettingsCard() {
   const current = THEME_OPTIONS.find((o) => o.value === theme) || THEME_OPTIONS[1];
   return `
     <div class="settingsCard">
-      <div class="sectionLabel">\u2699\uFE0F Pengaturan</div>
+      <div class="sectionLabel">${svgIcon("settings")} Pengaturan</div>
 
       <div class="settingsRow">
         <div class="settingsRowText">
-          <span class="settingsRowTitle">\uD83C\uDFAE Multiplayer</span>
+          <span class="settingsRowTitle">${svgIcon("gamepad")} Multiplayer</span>
           <span class="settingsRowDesc">Main bareng: masukkan kode room dari host</span>
         </div>
         <button class="themeModeToggle" id="mpOpenBtn" aria-label="Buka multiplayer">
@@ -38,7 +40,7 @@ function renderSettingsCard() {
           <span class="settingsRowDesc">Pilih tampilan!</span>
         </div>
         <button class="themeModeToggle" id="themeModeToggleBtn" aria-expanded="${themeMenuOpen}" aria-label="Pilih mode UI">
-          <span class="themeModeChevron${themeMenuOpen ? " open" : ""}">\u25BE</span>
+          <span class="themeModeChevron${themeMenuOpen ? " open" : ""}">${svgIcon("chevron-down")}</span>
         </button>
       </div>
       ${themeMenuOpen ? `
@@ -53,14 +55,14 @@ function renderSettingsCard() {
 
       <div class="settingsRow settingsRow-noBorder">
         <div class="settingsRowText">
-          <span class="settingsRowTitle">\uD83D\uDD09 Volume Suara</span>
+          <span class="settingsRowTitle">${svgIcon("speaker")} Volume Suara</span>
           <span class="settingsRowDesc">Atur kerasnya suara pas jawaban benar/salah</span>
         </div>
       </div>
       <div class="volumeSliderRow">
-        <span class="volumeIcon">\uD83D\uDD07</span>
+        <span class="volumeIcon">${svgIcon("speaker-off")}</span>
         <input type="range" min="0" max="100" step="1" value="${volPct}" class="volumeSlider" id="volumeSlider" aria-label="Volume suara">
-        <span class="volumeIcon">\uD83D\uDD0A</span>
+        <span class="volumeIcon">${svgIcon("speaker")}</span>
         <span class="volumeVal mono" id="volumeVal">${volPct}%</span>
       </div>
       ${renderAnswertoneCard()}
@@ -79,25 +81,24 @@ function renderCustomCard() {
             <span class="pkgTitle">${escapeHtml(rec.title)}</span>
             <span class="pkgMeta">${rec.questions.length} soal \u00B7 ${formatDateShort(rec.savedAt)}</span>
           </button>
-          <button class="resetBtn customDelBtn" data-del-custom="${escapeAttr(rec.id)}" title="Hapus kuis">\uD83D\uDDD1\uFE0F</button>
+          <button class="resetBtn customDelBtn" data-del-custom="${escapeAttr(rec.id)}" title="Hapus kuis">${svgIcon("trash")}</button>
         </div>`;
   }).join("");
   return `
     <div class="categoryGroup">
       <div class="customHead">
         <span class="catName">Custom Quiz (${customQuizzes.length})</span>
-        <span class="catMeta">tanpa batas</span>
+        <span class="catMeta">-</span>
       </div>
       <input type="file" id="docxInput" accept=".docx,.pdf" multiple hidden>
       ${list}
       <label class="dropZone" for="docxInput">
-        <span class="dropIcon">\uD83D\uDCC4</span>
+        <span class="dropIcon">${svgIcon("document")}</span>
         <span class="dropTitle">Drag and drop</span>
-        <span class="dropFormats"><span><code>.docx</code> — soal, gambar, soal rusak &amp; isian</span><span><code>.pdf</code> — soal pilihan ganda, teks dan gambar</span></span>
+        <span class="dropFormats"><code>.docx</code><code>.pdf</code></span>
       </label>
       <a class="templateLink" href="https://drive.google.com/drive/folders/1WSxodjrD3jGzQKj0DBROVTUo7I5iBAun?usp=sharing" target="_blank" rel="noopener">Download template disini</a>
-      ${dropMsg ? `<div class="dropMsg">${escapeHtml(dropMsg)}</div>` : ""}
-      <div class="dropFormat">Format: <code>1. Soal</code> \u00B7 opsi <code>A.</code>\u2013<code>E.</code> \u00B7 <code>Kunci: X</code> \u00B7 <code>{penjelasan}</code></div>
+      ${dropMsg ? `<div class="dropMsg">${markedMsgHtml(dropMsg)}</div>` : ""}
     </div>`;
 }
 
@@ -112,8 +113,8 @@ function renderPickerScreen() {
   let html = `
     <main class="wrap">
       <div class="pickerHeader">
-        <h1>Pilih Paket Soal</h1>
-        <p class="pickerSub">${packageManifest.length ? "Ketuk kategori untuk membuka daftar paket soal di dalamnya." : "Upload file .docx untuk dijadikan kuis."}</p>
+        <h1 class="brandH1">Soalin<span class="brandMark">${svgIcon("brand")}</span></h1>
+        <p class="pickerSub">${packageManifest.length ? "Belajar? Kau?" : "Upload file .docx untuk dijadikan kuis."}</p>
       </div>
       <div class="categoryList">
         ${renderCustomCard()}
@@ -127,7 +128,7 @@ function renderPickerScreen() {
         <button class="categoryHeader${isOpen ? " open" : ""}" data-cat="${escapeAttr(cat)}">
           <span class="catName">${escapeHtml(cat)}</span>
           <span class="catMeta">${pkgs.length} paket</span>
-          <span class="catArrow">${isOpen ? "\u25B2" : "\u25BC"}</span>
+          <span class="catArrow">${isOpen ? svgIcon("chevron-up") : svgIcon("chevron-down")}</span>
         </button>
         <div class="categoryBody${isOpen ? " open" : ""}">
           ${pkgs.map((p) => `
@@ -144,7 +145,7 @@ function renderPickerScreen() {
   html += `</div>`;
   html += renderSettingsCard();
   if (allQuestions.length) {
-    html += `<button class="pickerCloseBtn" id="pickerCloseBtn">\u2190 Kembali ke paket saat ini</button>`;
+    html += `<button class="pickerCloseBtn iconBtn" id="pickerCloseBtn" title="Kembali ke paket saat ini" aria-label="Kembali ke paket saat ini">${svgIcon("chevron-left")} <span class="lbl">Kembali ke paket saat ini</span></button>`;
   }
   html += `</main>`;
   return html;
