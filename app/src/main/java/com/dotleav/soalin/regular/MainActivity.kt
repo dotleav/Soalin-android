@@ -2,7 +2,6 @@ package com.dotleav.soalin.regular
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.webkit.CookieManager
@@ -31,6 +30,12 @@ class MainActivity : ComponentActivity() {
     private val pickFiles = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris ->
         filePathCallback?.onReceiveValue(if (uris.isNullOrEmpty()) null else uris.toTypedArray())
         filePathCallback = null
+    }
+
+    // Izin notifikasi / storage untuk update. Setelah jawaban, notifikasi dicoba lagi:
+    // kalau izin baru diberikan, notifikasi langsung muncul.
+    private val askPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        UpdateChecker.notifyIfPending(this) { }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -95,21 +100,12 @@ class MainActivity : ComponentActivity() {
             }
         })
 
-        UpdateChecker.check(this)
+        UpdateChecker.check(this) { askPermission.launch(it) }
 
         if (savedInstanceState == null) {
             web.loadUrl("https://appassets.androidplatform.net/assets/www/index.html")
         } else {
             web.restoreState(savedInstanceState)
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == UpdateChecker.REQ_NOTIF &&
-            grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
-        ) {
-            UpdateChecker.notifyIfPending(this)
         }
     }
 

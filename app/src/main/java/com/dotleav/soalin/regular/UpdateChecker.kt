@@ -15,7 +15,6 @@ import android.os.Build
 import android.os.Environment
 import android.widget.RemoteViews
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -31,8 +30,6 @@ import java.util.concurrent.Executors
  * Dicek paling sering sekali per 6 jam; gagal diam-diam kalau offline.
  */
 object UpdateChecker {
-    const val REQ_NOTIF = 4102
-    const val REQ_STORAGE = 4103
     const val ACTION_DOWNLOAD = "com.dotleav.soalin.regular.UPDATE_DOWNLOAD"
     const val ACTION_LATER = "com.dotleav.soalin.regular.UPDATE_LATER"
 
@@ -48,11 +45,11 @@ object UpdateChecker {
     private val worker = Executors.newSingleThreadExecutor()
 
     /** Dipanggil dari MainActivity.onCreate. */
-    fun check(activity: Activity) {
+    fun check(activity: Activity, ask: (String) -> Unit) {
         val prefs = activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val last = prefs.getLong("last_check", 0L)
         if (System.currentTimeMillis() - last < INTERVAL_MS) {
-            notifyIfPending(activity)
+            notifyIfPending(activity, ask)
             return
         }
         worker.execute {
@@ -66,7 +63,7 @@ object UpdateChecker {
             } catch (e: Exception) {
                 return@execute // offline atau repo tidak bisa diakses: coba lagi nanti
             }
-            activity.runOnUiThread { notifyIfPending(activity) }
+            activity.runOnUiThread { notifyIfPending(activity, ask) }
         }
     }
 
@@ -86,9 +83,10 @@ object UpdateChecker {
 
     /**
      * Tampilkan notifikasi untuk update yang tertunda.
-     * Muncul sekali per versi, kecuali setelah "Lain kali" (lihat later()).
+     * Muncul sekali per versi, dan muncul lagi di pembukaan app berikutnya setelah "Lain kali".
+     * [ask] dipanggil untuk meminta izin runtime; hasilnya dikirim kembali ke MainActivity.
      */
-    fun notifyIfPending(activity: Activity) {
+    fun notifyIfPending(activity: Activity, ask: (String) -> Unit) {
         val prefs = activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val remoteCode = prefs.getInt("remote_code", 0)
         if (remoteCode <= BuildConfig.VERSION_CODE) return
@@ -98,9 +96,7 @@ object UpdateChecker {
             // Minta izin sekali per versi; kalau ditolak, tidak diminta lagi sampai versi baru.
             if (!prefs.getBoolean("asked_notif_$remoteCode", false)) {
                 prefs.edit().putBoolean("asked_notif_$remoteCode", true).apply()
-                ActivityCompat.requestPermissions(
-                    activity, arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQ_NOTIF
-                )
+                ask(Manifest.permission.POST_NOTIFICATIONS)
             }
             return
         }
@@ -112,9 +108,7 @@ object UpdateChecker {
             !prefs.getBoolean("asked_storage_$remoteCode", false)
         ) {
             prefs.edit().putBoolean("asked_storage_$remoteCode", true).apply()
-            ActivityCompat.requestPermissions(
-                activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQ_STORAGE
-            )
+            ask(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
 
         post(activity, prefs.getString("remote_name", "") ?: "")
