@@ -2,5 +2,9 @@
     <string name="app_name">Soalin</string>
     <string name="update_channel">Pembaruan aplikasi</string>
     <string name="update_title">Update Soalin tersedia</string>
-    <string name="update_text">Versi %1$s sudah bisa diunduh. Ketuk untuk membuka APK terbaru.</string>
+    <string name="update_text">Versi %1$s sudah bisa diunduh.</string>
+    <string name="update_version">v%1$s</string>
+    <string name="update_download_desc">Unduh APK terbaru</string>
+    <string name="update_later">Lain kali</string>
+    <string name="update_no_storage">Izin penyimpanan belum diberikan, APK disimpan di folder aplikasi Soalin.</string>
 </resources>
