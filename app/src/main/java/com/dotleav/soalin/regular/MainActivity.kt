@@ -2,6 +2,7 @@ package com.dotleav.soalin.regular
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.webkit.CookieManager
@@ -94,10 +95,21 @@ class MainActivity : ComponentActivity() {
             }
         })
 
+        UpdateChecker.check(this)
+
         if (savedInstanceState == null) {
             web.loadUrl("https://appassets.androidplatform.net/assets/www/index.html")
         } else {
             web.restoreState(savedInstanceState)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == UpdateChecker.REQ_NOTIF &&
+            grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
+        ) {
+            UpdateChecker.notifyIfPending(this)
         }
     }
 
