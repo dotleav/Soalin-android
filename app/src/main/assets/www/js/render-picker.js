@@ -27,6 +27,7 @@ function renderSettingsCard() {
       <div class="settingsRow">
         <div class="settingsRowText">
           <span class="settingsRowTitle">${svgIcon("gamepad")} Multiplayer</span>
+          <span class="settingsRowDesc">Main bareng: masukkan kode room dari host</span>
         </div>
         <button class="themeModeToggle" id="mpOpenBtn" aria-label="Buka multiplayer">
           <span class="themeModeChevron">\u203A</span>
@@ -36,6 +37,7 @@ function renderSettingsCard() {
       <div class="settingsRow">
         <div class="settingsRowText">
           <span class="settingsRowTitle themeModeTitle">${current.icon} Mode UI: ${current.label}</span>
+          <span class="settingsRowDesc">Pilih tampilan!</span>
         </div>
         <button class="themeModeToggle" id="themeModeToggleBtn" aria-expanded="${themeMenuOpen}" aria-label="Pilih mode UI">
           <span class="themeModeChevron${themeMenuOpen ? " open" : ""}">${svgIcon("chevron-down")}</span>
@@ -54,6 +56,7 @@ function renderSettingsCard() {
       <div class="settingsRow settingsRow-noBorder">
         <div class="settingsRowText">
           <span class="settingsRowTitle">${svgIcon("speaker")} Volume Suara</span>
+          <span class="settingsRowDesc">Atur kerasnya suara pas jawaban benar/salah</span>
         </div>
       </div>
       <div class="volumeSliderRow">

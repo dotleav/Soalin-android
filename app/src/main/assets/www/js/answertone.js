@@ -163,7 +163,6 @@ function answertonePreview(id) {
 function renderAnswertoneCard() {
   const items = [...soundCatalog].sort((a, b) => a.name.localeCompare(b.name, "id"));
   const onCount = items.filter((s) => answertoneGet(s).on).length;
-  const allSelected = items.length > 0 && onCount === items.length;
   const rows = items.map((s) => {
     const cfg = answertoneGet(s);
     const id = answertoneAttr(s.id);
@@ -186,6 +185,7 @@ function renderAnswertoneCard() {
         <div class="settingsRow atHead">
           <div class="settingsRowText">
             <span class="settingsRowTitle">${svgIcon("music")} Answertone</span>
+            <span class="settingsRowDesc">Suara yang hanya keluar saat jawaban terjawab. Aktif: ${onCount} dari ${items.length}.</span>
           </div>
           <button class="themeModeToggle" id="atToggleBtn" aria-expanded="${answertoneOpen}" aria-label="Buka daftar Answertone">
             <span class="themeModeChevron${answertoneOpen ? " open" : ""}">${svgIcon("chevron-down")}</span>
@@ -194,11 +194,13 @@ function renderAnswertoneCard() {
         ${answertoneOpen ? `
         <div class="atBody">
           <div class="atBulk">
-            <button class="atBulkBtn" data-at-bulk="${allSelected ? "none" : "all"}">${allSelected ? "Unselect all" : "Select all"}</button>
-            <button class="atBulkBtn" id="atAddBtn">+ Custom</button>
+            <button class="atBulkBtn" data-at-bulk="all">Centang semua</button>
+            <button class="atBulkBtn" data-at-bulk="none">Kosongkan</button>
+            <button class="atBulkBtn" id="atAddBtn">+ Suara sendiri</button>
             <input type="file" id="atFile" accept="audio/*" hidden>
           </div>
           ${items.length ? `<div class="atList">${rows}</div>` : `<div class="atEmpty">Suara belum termuat. Coba buka ulang halaman.</div>`}
+          <div class="atHint">Suara yang tidak dicentang tidak akan keluar. Kalau semua kosong, tidak ada suara yang keluar.</div>
         </div>` : ""}
       </div>`;
 }
