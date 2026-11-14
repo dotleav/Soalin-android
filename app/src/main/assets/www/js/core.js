@@ -18,7 +18,7 @@ const DIFFICULTY_CONFIG = {
   folivora: { label: "Folivora",     sticker: "./images/modes/folivora.webp",  timerSeconds: 300, tentamen: true,  desc: "pasti pas ditanya jawabannya \u201Chah?\u201D",  color: "#86efac" },
   bekicot:  { label: "Bekicot",      sticker: "./images/modes/bekicot.webp",   timerSeconds: 0,   tentamen: false, desc: "mode biasa aja kalau gitu",                    color: "#c084fc" },
   minites:  { label: "minites dr Erda", icon: "./images/difficulty/squidward.png", sticker: "./images/modes/minites.webp", timerSeconds: 15, tentamen: true, desc: "Makan noh 15 detik", color: "#2dd4bf" },
-  cbt:      { label: "CBT", sticker: "./images/modes/cbt.webp", timerSeconds: 0, tentamen: false, cbt: true, desc: "Computer Based Test", descHtml: "<s>Cognitive Based Therapy</s><br><b>Computer Based Test</b>", color: "#f472b6" },
+  cbt:      { label: "CBT", sticker: "./images/modes/cbt.webp", timerSeconds: 0, tentamen: false, cbt: true, desc: "Computer Based Trauma", descHtml: "<s>Computer Based Trauma</s>", color: "#f472b6" },
 };
 
 // Ikon tingkat kesulitan: pakai gambar kalau ada `icon`, selain itu emoji.
@@ -40,7 +40,7 @@ function escapeHtml(str) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 }
-function escapeAttr(str) { return escapeHtml(str); }
+function escapeAttr(str) { return escapeHtml(str).replace(/"/g, "&quot;").replace(/'/g, "&#39;"); }
 
 // ── Audio (benar/salah) ──────────────────────────────────────────────────
 // Suara bawaan: taruh file di audio/benar/ dan audio/salah/, lalu jalankan

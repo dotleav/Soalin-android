@@ -57,7 +57,7 @@ function renderCbtTimeBar() {
   return `
     <div class="cbtTimeCard">
       <div class="cbtTimeHead">
-        <span class="sectionLabel cbtTimeTitle">Batas waktu satu paket</span>
+        <span class="sectionLabel cbtTimeTitle">Batas waktu</span>
         <span class="cbtTimeVal mono" id="cbtTimeVal">${cbtFmtDurasi(cbtTimeLimitSec)}</span>
       </div>
       <div class="cbtTimeRow">
@@ -67,7 +67,7 @@ function renderCbtTimeBar() {
           <span>menit</span>
         </label>
       </div>
-      <p class="cbtTimeHint">Default 2 jam. Ini batas total untuk mengerjakan paket: waktu tidak memaksa jawaban dan tidak menandai salah.</p>
+      <p class="cbtTimeHint">Default 2 jam.</p>
     </div>`;
 }
 function cbtSetTimeFromInput(src) {
@@ -152,7 +152,7 @@ function renderCbtIsianCard(q, qNum, value, disabled) {
         ${imgs.length > 0 ? `<span class="imgBadge">${svgIcon("image")} Bergambar</span>` : ""}
       </div>
       <p class="qText"><span class="qNum mono">${qNum}.</span>${escapeHtml(q.question)}</p>
-      ${imgs.map(src => `<img class="qImg" src="${src}" alt="gambar soal">`).join("")}
+      ${imgs.map(src => `<img class="qImg" src="${escapeAttr(src)}" alt="gambar soal">`).join("")}
       <textarea class="cbtIsianInput" rows="3" placeholder="Ketik jawabanmu di sini\u2026 (boleh diganti sebelum Submit)" ${disabled ? "disabled" : ""}>${escapeHtml(v)}</textarea>
     </div>`;
 }

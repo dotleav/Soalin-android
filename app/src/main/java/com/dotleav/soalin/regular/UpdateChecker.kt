@@ -13,14 +13,19 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.widget.RemoteViews
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import org.json.JSONObject
+import java.io.FileInputStream
+import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.security.MessageDigest
 import java.util.concurrent.Executors
 
 /**
@@ -37,6 +42,9 @@ object UpdateChecker {
         "https://raw.githubusercontent.com/dotleav/Soalin-android/master/app/release/output-metadata.json"
     private const val APK_URL =
         "https://github.com/dotleav/Soalin-android/raw/master/app/release/app-release.apk"
+    private const val SHA_URL =
+        "https://raw.githubusercontent.com/dotleav/Soalin-android/master/app/release/app-release.apk.sha256"
+    private val SHA_REGEX = Regex("[0-9a-f]{64}")
     private const val CHANNEL_ID = "soalin_update"
     private const val NOTIF_ID = 4101
     private const val PREFS = "soalin_update"
@@ -55,10 +63,12 @@ object UpdateChecker {
         worker.execute {
             try {
                 val remote = fetchRemote()
+                val sha = fetchSha()
                 prefs.edit()
                     .putLong("last_check", System.currentTimeMillis())
                     .putInt("remote_code", remote.first)
                     .putString("remote_name", remote.second)
+                    .putString("remote_sha", sha)
                     .apply()
             } catch (e: Exception) {
                 return@execute // offline atau repo tidak bisa diakses: coba lagi nanti
@@ -76,6 +86,20 @@ object UpdateChecker {
             val body = conn.inputStream.bufferedReader().use { it.readText() }
             val el = JSONObject(body).getJSONArray("elements").getJSONObject(0)
             return Pair(el.getInt("versionCode"), el.getString("versionName"))
+        } finally {
+            conn.disconnect()
+        }
+    }
+
+    /** Ambil checksum SHA-256 APK dari repo (format sha256sum: "<hash>  <nama file>"). */
+    private fun fetchSha(): String {
+        val conn = URL(SHA_URL).openConnection() as HttpURLConnection
+        try {
+            conn.connectTimeout = 8000
+            conn.readTimeout = 8000
+            if (conn.responseCode != 200) throw IllegalStateException("HTTP ${conn.responseCode}")
+            val line = conn.inputStream.bufferedReader().use { it.readLine() } ?: ""
+            return line.trim().split(Regex("\\s+"))[0].lowercase()
         } finally {
             conn.disconnect()
         }
@@ -115,10 +139,16 @@ object UpdateChecker {
         prefs.edit().putInt("notified_code", remoteCode).apply()
     }
 
-    /** Tombol unduh di notifikasi: simpan APK dari repo ke folder Download. */
+    /** Tombol unduh di notifikasi: simpan APK dari repo ke folder Download. Unduhan diverifikasi saat selesai. */
     fun download(ctx: Context) {
-        val name = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getString("remote_name", "") ?: ""
+        val prefs = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val name = prefs.getString("remote_name", "") ?: ""
+        val sha = prefs.getString("remote_sha", "") ?: ""
+        if (!SHA_REGEX.matches(sha)) {
+            // Tanpa checksum dari repo, APK tidak boleh dipasang: batalkan dan minta coba lagi nanti.
+            toast(ctx, ctx.getString(R.string.update_no_sha))
+            return
+        }
         val fileName = "Soalin-v$name.apk"
         val req = DownloadManager.Request(Uri.parse(APK_URL))
             .setTitle("Soalin v$name")
@@ -130,8 +160,54 @@ object UpdateChecker {
             req.setDestinationInExternalFilesDir(ctx, Environment.DIRECTORY_DOWNLOADS, fileName)
             Toast.makeText(ctx, R.string.update_no_storage, Toast.LENGTH_LONG).show()
         }
-        (ctx.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager).enqueue(req)
+        val dm = ctx.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val id = dm.enqueue(req)
+        prefs.edit().putLong("dl_id", id).putString("dl_sha", sha).apply()
         NotificationManagerCompat.from(ctx).cancel(NOTIF_ID)
+    }
+
+    /**
+     * Dipanggil UpdateReceiver saat DownloadManager selesai. Hash SHA-256 file dihitung di thread worker
+     * dan dibandingkan dengan checksum dari repo. Kalau tidak cocok, file dihapus.
+     */
+    fun verifyDownload(ctx: Context, id: Long) {
+        val prefs = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        if (id == -1L || prefs.getLong("dl_id", -1L) != id) return // bukan unduhan kita
+        val expected = prefs.getString("dl_sha", "") ?: ""
+        val dm = ctx.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        worker.execute {
+            val ok = try {
+                val succeeded = dm.query(DownloadManager.Query().setFilterById(id)).use { c ->
+                    c.moveToFirst() &&
+                        c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL
+                }
+                if (!succeeded) return@execute // gagal diunduh: notifikasi sistem yang memberi tahu
+                val actual = dm.openDownloadedFile(id).use { pfd ->
+                    FileInputStream(pfd.fileDescriptor).use { sha256Hex(it) }
+                }
+                actual.equals(expected, ignoreCase = true)
+            } catch (e: Exception) {
+                false
+            }
+            if (!ok) dm.remove(id)
+            prefs.edit().remove("dl_id").remove("dl_sha").apply()
+            toast(ctx, ctx.getString(if (ok) R.string.update_verified else R.string.update_bad_apk))
+        }
+    }
+
+    private fun sha256Hex(input: InputStream): String {
+        val md = MessageDigest.getInstance("SHA-256")
+        val buf = ByteArray(8192)
+        while (true) {
+            val n = input.read(buf)
+            if (n < 0) break
+            md.update(buf, 0, n)
+        }
+        return md.digest().joinToString("") { "%02x".format(it) }
+    }
+
+    private fun toast(ctx: Context, msg: String) {
+        Handler(Looper.getMainLooper()).post { Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show() }
     }
 
     /**

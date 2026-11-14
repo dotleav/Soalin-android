@@ -17,19 +17,19 @@
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.15s;
 }
-.modeTile:hover { transform: translateY(-2px); }
+@media (hover: hover) { .modeTile:hover { transform: translateY(-2px); } }
 .modeTile:focus-visible { outline: 2px dashed var(--accent); outline-offset: 3px; }
 .modeSticker {
   display: block; width: 100%; max-width: 150px; height: auto;
+  aspect-ratio: 1000 / 915; object-fit: contain;
   -webkit-user-drag: none; user-select: none; pointer-events: none;
   filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.22));
   opacity: 0.72;
   transition: transform 0.18s, filter 0.18s, opacity 0.18s;
 }
-.modeTile:hover .modeSticker { opacity: 0.95; }
+@media (hover: hover) { .modeTile:hover .modeSticker { opacity: 0.95; } }
 .modeTile.active .modeSticker {
   opacity: 1;
-  transform: translateY(-3px) scale(1.04);
   filter: drop-shadow(0 0 10px var(--mc)) drop-shadow(0 6px 0 rgba(0, 0, 0, 0.3));
 }
 .modeCaption {

@@ -9,13 +9,18 @@
         "reveal": { ".read": "auth != null" },
         "players": {
           ".read": "auth != null",
-          "$uid": { ".write": "$uid === auth.uid" }
+          "$uid": {
+            ".write": "$uid === auth.uid",
+            ".validate": "newData.hasChildren(['name', 'joinedAt']) && newData.child('name').isString() && newData.child('name').val().length <= 20 && newData.child('joinedAt').isNumber() && (!newData.hasChild('done') || newData.child('done').isBoolean())"
+          }
         },
         "answers": {
           ".read": "root.child('rooms/' + $code + '/meta/hostUid').val() === auth.uid",
           "$i": {
+            ".validate": "$i.matches(/^[0-9]{1,4}$/)",
             "$uid": {
-              ".write": "$uid === auth.uid && !root.child('rooms/' + $code + '/reveal/' + $i).exists()"
+              ".write": "$uid === auth.uid && !root.child('rooms/' + $code + '/reveal/' + $i).exists() && root.child('rooms/' + $code + '/state/phase').val() === 'playing' && ((root.child('rooms/' + $code + '/meta/cbt').val() === true && now <= root.child('rooms/' + $code + '/state/startedAt').val() + root.child('rooms/' + $code + '/meta/cbtSec').val() * 1000 + 3000) || (root.child('rooms/' + $code + '/meta/cbt').val() !== true && (root.child('rooms/' + $code + '/meta/timerSeconds').val() === 0 || now <= root.child('rooms/' + $code + '/state/startedAt').val() + root.child('rooms/' + $code + '/meta/timerSeconds').val() * 1000 + 3000)))",
+              ".validate": "newData.isString() && newData.val().matches(/^[A-E]$/)"
             }
           }
         }

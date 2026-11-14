@@ -15,7 +15,7 @@ function renderBrokenDeck(list) {
     <div class="brokenReveal">
       <div class="tag">${svgIcon("bulb")} Penjelasan</div>
       ${q.explanation ? `<p class="brokenExp">${escapeHtml(q.explanation)}</p>` : ""}
-      ${eImgs.map(src => `<img class="exImg" src="${src}" alt="gambar penjelasan">`).join("")}
+      ${eImgs.map(src => `<img class="exImg" src="${escapeAttr(src)}" alt="gambar penjelasan">`).join("")}
       ${hasExp ? "" : `<p class="noImg">(belum ada penjelasan di dokumen ini)</p>`}
     </div>` : "";
 
@@ -28,7 +28,7 @@ function renderBrokenDeck(list) {
           <span class="brokenCount">${brokenIdx + 1} / ${n}</span>
         </div>
         <p class="brokenQ">${escapeHtml(q.question)}</p>
-        ${qImgs.map(src => `<img class="exImg" src="${src}" alt="gambar soal">`).join("")}
+        ${qImgs.map(src => `<img class="exImg" src="${escapeAttr(src)}" alt="gambar soal">`).join("")}
         ${revealHtml}
       </div>
       <div class="brokenNav">
@@ -89,7 +89,7 @@ function renderIsianCard(q, qNum, answeredValue) {
         ${isAnswered ? `<span class="tapHint">${svgIcon("check")} Sudah dijawab</span>` : ""}
       </div>
       <p class="qText"><span class="qNum mono">${qNum}.</span>${escapeHtml(q.question)}</p>
-      ${(q.questionImages || []).map(src => `<img class="qImg" src="${src}" alt="gambar soal">`).join("")}
+      ${(q.questionImages || []).map(src => `<img class="qImg" src="${escapeAttr(src)}" alt="gambar soal">`).join("")}
       ${bodyHtml}
     </div>
   `;
@@ -160,7 +160,7 @@ function renderQuestionCard(q, qNum, chosen, revealAnswer, opts = {}) {
     <div class="explanation">
       <div class="tag">${svgIcon("image")} Gambar Penjelasan</div>
       ${q.explanation ? `<p>${escapeHtml(q.explanation)}</p>` : ""}
-      ${(q.explanationImages || []).map(src => `<img class="exImg" src="${src}" alt="gambar penjelasan">`).join("")}
+      ${(q.explanationImages || []).map(src => `<img class="exImg" src="${escapeAttr(src)}" alt="gambar penjelasan">`).join("")}
     </div>
   ` : "";
 
@@ -170,7 +170,7 @@ function renderQuestionCard(q, qNum, chosen, revealAnswer, opts = {}) {
         ${(q.questionImages || []).length > 0 ? `<span class="imgBadge">${svgIcon("image")} Bergambar</span>` : ""}
       </div>
       <p class="qText"><span class="qNum mono">${qNum}.</span>${escapeHtml(q.question)}</p>
-      ${(q.questionImages || []).map(src => `<img class="qImg" src="${src}" alt="gambar soal">`).join("")}
+      ${(q.questionImages || []).map(src => `<img class="qImg" src="${escapeAttr(src)}" alt="gambar soal">`).join("")}
       <div class="options">${optionsHtml}</div>
       ${skipNoteHtml}
       ${explanationHtml}

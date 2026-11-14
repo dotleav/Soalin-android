@@ -262,6 +262,8 @@ async function convertDocx(buf) {
       const hl = rawLine.text.startsWith(HL_MARK); // baris ini di-highlight (penanda kunci)
       const { images, isHeading, isListItem } = rawLine;
       const text = hl ? rawLine.text.slice(HL_MARK.length).trimStart() : rawLine.text;
+      // Soal/kunci baru memotong opsi yang belum selesai ("{" tanpa "}"): jangan telan baris ini.
+      if (pendingOpt && current && (isListItem || questionStart.test(text) || answerLine.test(text)) && text.indexOf("}") < 0) pendingOpt = null;
       if (pendingOpt && current) {
         const close = text.indexOf("}");
         const chunk = close < 0 ? text : text.slice(0, close);
@@ -316,7 +318,7 @@ async function convertDocx(buf) {
       for (const cells of rows) {
         if (cells.length < 2) continue;
         const lines = cells.map((c) => flat(c).flatMap(paraLines));
-        const text = (i) => lines[i].map((l) => l.text).filter(Boolean).join(" ");
+        const text = (i) => (lines[i] || []).map((l) => l.text).filter(Boolean).join(" ");
         const images = (i) => (lines[i] || []).flatMap((l) => l.images);
         const origNo = text(0), questionText = text(1);
         const expText = (lines[2] || []).map((l) => l.text).filter(Boolean).join("\n");
@@ -342,7 +344,7 @@ async function convertDocx(buf) {
       for (const cells of rows) {
         if (cells.length < 2) continue;
         const lines = cells.map((c) => flat(c).flatMap(paraLines));
-        const text = (i) => lines[i].map((l) => l.text).filter(Boolean).join(" ");
+        const text = (i) => (lines[i] || []).map((l) => l.text).filter(Boolean).join(" ");
         const images = (i) => (lines[i] || []).flatMap((l) => l.images);
         const origNo = text(0), questionText = text(1), jawabanText = text(2);
         if (isFirstRow || /^no\.?$/i.test(origNo)) {

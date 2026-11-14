@@ -7,4 +7,7 @@
     <string name="update_download_desc">Unduh APK terbaru</string>
     <string name="update_later">Lain kali</string>
     <string name="update_no_storage">Izin penyimpanan belum diberikan, APK disimpan di folder aplikasi Soalin.</string>
+    <string name="update_no_sha">Checksum unduhan belum tersedia. Unduhan dibatalkan, coba lagi nanti.</string>
+    <string name="update_verified">Unduhan Soalin terverifikasi (SHA-256 cocok).</string>
+    <string name="update_bad_apk">Unduhan Soalin tidak cocok dengan checksum. File dihapus.</string>
 </resources>

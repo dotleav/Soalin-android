@@ -21,6 +21,7 @@ let mpListeners = [];     // [ref, cb] untuk dilepas saat keluar room
 let mpHostTimer = null;   // host: timer auto reveal / auto next
 let mpTickHandle = null;  // render ulang tiap 500ms untuk hitung mundur
 let mpRevealingIdx = null; // host: soal yang sedang dibuka otomatis
+let mpCbtIdx = 0;   // CBT: nomor soal yang sedang dibuka pemain
 const MP_NAME_KEY = "soalin-mp-name";
 const MP_CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 
@@ -31,11 +32,39 @@ function mpNow() { return Date.now() + mpServerOffset; }
 function mpTimerSec() { return mpRoom.meta?.timerSeconds || 0; }
 
 // Sisa waktu soal aktif (ms). null = mode tanpa timer.
+// Batas waktu room (ms): CBT = total satu paket, mode lain = per soal. 0 = tanpa batas.
+function mpLimitMs() {
+  const m = mpRoom.meta;
+  if (!m) return 0;
+  return m.cbt ? (m.cbtSec || 0) * 1000 : (m.timerSeconds || 0) * 1000;
+}
+function mpTimerText(rem) {
+  const s = Math.ceil(rem / 1000);
+  return mpRoom.meta?.cbt ? cbtFmtClock(s) : `${s} dtk`;
+}
 function mpRemaining() {
   const st = mpRoom.state;
-  const timer = mpTimerSec();
-  if (!st || !timer || st.phase !== "playing") return null;
-  return Math.max(0, (st.startedAt || mpNow()) + timer * 1000 - mpNow());
+  const lim = mpLimitMs();
+  if (!st || !lim || st.phase !== "playing") return null;
+  return Math.max(0, (st.startedAt || mpNow()) + lim - mpNow());
+}
+
+// Hitung mundur: cukup ganti teks dan lebar bar. Render penuh hanya saat waktu habis, sekali per soal.
+let mpExpiredIdx = null;
+function mpTick() {
+  if (mpScreen !== "room") return;
+  const rem = mpRemaining();
+  if (rem === null) return;
+  if (rem === 0) {
+    const idx = mpRoom.state?.currentIdx;
+    if (mpExpiredIdx !== idx) { mpExpiredIdx = idx; render(); }
+    return;
+  }
+  const timerEl = document.querySelector(".mpTimer");
+  if (!timerEl) return;
+  timerEl.textContent = mpTimerText(rem);
+  const fillEl = document.querySelector(".mpTimerFill");
+  if (fillEl) fillEl.style.width = `${(rem / mpLimitMs()) * 100}%`;
 }
 
 function mpInit() {
@@ -105,6 +134,8 @@ async function mpCreateRoom() {
       count: qs.length,
       difficulty: mpDiff,
       timerSeconds: cfg.timerSeconds,
+      cbt: mpDiff === "cbt",
+      cbtSec: mpDiff === "cbt" ? cbtTimeLimitSec : 0,
       shuffled: mpShuffle,
       order,
       createdAt: firebase.database.ServerValue.TIMESTAMP,
@@ -158,9 +189,9 @@ async function mpEnterRoom(code, asHost) {
   mpIsHost = asHost;
   try { mpMyAnswers = JSON.parse(localStorage.getItem(mpAnswersKey()) || "{}"); } catch { mpMyAnswers = {}; }
   mpAttachListeners();
-  mpTickHandle = setInterval(() => {
-    if (mpScreen === "room" && mpRemaining() !== null) render();
-  }, 500);
+  mpExpiredIdx = null;
+  mpCbtIdx = 0;
+  mpTickHandle = setInterval(mpTick, 500);
   mpScreen = "room";
   mpBusy = false;
   render();
@@ -233,13 +264,16 @@ function mpLeave() {
 
 // ── Aksi pemain ───────────────────────────────────────────────────────────
 function mpAnswer(letter) {
-  const i = mpRoom.state.currentIdx;
-  if (mpIsHost || mpRoom.reveal?.[i] || mpMyAnswers[i] !== undefined) return;
-  if (mpRemaining() === 0) return; // waktu habis
+  const cbt = !!mpRoom.meta?.cbt;
+  const i = cbt ? mpCbtIdx : mpRoom.state.currentIdx;
+  const prev = mpMyAnswers[i];
+  if (mpIsHost || mpRoom.reveal?.[i] || mpRemaining() === 0) return;
+  // CBT: boleh ganti jawaban sampai "Selesai" atau waktu habis. Mode lain: sekali jawab.
+  if (cbt ? (mpRoom.players?.[mpUid]?.done || prev === letter) : prev !== undefined) return;
   mpMyAnswers[i] = letter;
   try { localStorage.setItem(mpAnswersKey(), JSON.stringify(mpMyAnswers)); } catch { /* noop */ }
   mpDb().ref(`rooms/${mpRoomCode}/answers/${i}/${mpUid}`).set(letter).catch((err) => {
-    delete mpMyAnswers[i];
+    if (prev === undefined) delete mpMyAnswers[i]; else mpMyAnswers[i] = prev;
     try { localStorage.setItem(mpAnswersKey(), JSON.stringify(mpMyAnswers)); } catch { /* noop */ }
     mpError = `Jawaban gagal dikirim: ${err.message}`;
     render();
@@ -314,6 +348,7 @@ function mpHostSchedule() {
   const st = mpRoom.state;
   const timer = mpTimerSec();
   if (!mpIsHost || !st || st.phase !== "playing") return;
+  if (mpRoom.meta?.cbt) { mpHostScheduleCbt(); return; }
   const i = st.currentIdx;
   if (!st.revealed) {
     if (mpRoom.reveal?.[i] === undefined && mpRevealingIdx !== i && mpAllAnswered(i)) {
@@ -328,6 +363,30 @@ function mpHostSchedule() {
   } else if (timer) {
     mpHostTimer = setTimeout(() => mpHostNext(i).catch(console.error), 2000);
   }
+}
+
+// ── Mode CBT (multiplayer): semua soal sekaligus, batas waktu total. Pemain bebas pindah
+// soal dan mengganti jawaban sampai "Selesai" atau waktu habis. Semua jawaban dibuka bersama.
+function mpAllDone() {
+  const ps = Object.values(mpRoom.players || {});
+  return ps.length > 0 && ps.every((p) => p.done === true);
+}
+function mpHostScheduleCbt() {
+  const wait = (mpRoom.state.startedAt || mpNow()) + mpRoom.meta.cbtSec * 1000 - mpNow();
+  if (mpAllDone() || wait <= 0) { mpHostEndCbt().catch(console.error); return; }
+  mpHostTimer = setTimeout(() => mpHostEndCbt().catch(console.error), wait);
+}
+// Buka semua jawaban sekaligus dan tutup sesi. Jawaban yang datang sesudahnya ditolak aturan database.
+function mpHostEndCbt() {
+  const updates = { [`rooms/${mpRoomCode}/state/phase`]: "ended", [`rooms/${mpRoomCode}/state/revealed`]: true };
+  mpLocalQs.forEach((q, i) => {
+    updates[`rooms/${mpRoomCode}/reveal/${i}`] = {
+      answer: q.answer || "",
+      explanation: q.explanation || "",
+      explanationImages: (q.explanationImages || []).filter((s) => typeof s === "string"),
+    };
+  });
+  return mpDb().ref().update(updates);
 }
 
 function mpHostClose() {
@@ -395,6 +454,14 @@ async function mpAct(act, el) {
       }
       case "close":
         if (confirm("Tutup room? Semua pemain akan keluar.")) await mpHostClose();
+        break;
+      case "cbtjump": mpCbtIdx = Number(el.dataset.idx); break;
+      case "cbtstep": mpCbtIdx = Math.min(mpRoom.meta.count - 1, Math.max(0, mpCbtIdx + Number(el.dataset.d))); break;
+      case "cbtdone":
+        if (confirm("Selesai? Jawaban tidak bisa diubah lagi.")) await mpDb().ref(`rooms/${mpRoomCode}/players/${mpUid}/done`).set(true);
+        break;
+      case "cbtend":
+        if (confirm("Akhiri sekarang? Semua jawaban dibuka.")) await mpHostEndCbt();
         break;
       case "leave": mpLeave(); render(); return;
       case "answer": mpAnswer(el.dataset.letter); return;

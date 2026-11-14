@@ -100,7 +100,7 @@ function resetQuizStateForNewPackage() {
 async function selectPackage(pkg) {
   try {
     const mod = pkg.custom
-      ? { questions: prepareCustomQs(customRec(pkg.recId)) }
+      ? { questions: prepareCustomQs(await loadCustomFull(pkg.recId)) }
       : pkg.remote
         ? { questions: await loadRemoteQuestions(pkg) }
         : { questions: [] };
@@ -143,6 +143,7 @@ function clearCustomProgress(recId) {
 
 // Rekaman IndexedDB → soal siap main (index gambar diganti object URL).
 function prepareCustomQs(rec) {
+  if (!rec) return [];
   customUrls.forEach((u) => u && URL.revokeObjectURL(u));
   const urls = rec.blobs.map((b) => b && URL.createObjectURL(b));
   customUrls = urls;
@@ -151,18 +152,46 @@ function prepareCustomQs(rec) {
   return rec.questions.map((q) => ({ ...q, questionImages: pick(q.questionImages), explanationImages: pick(q.explanationImages), optionImages: pickOpt(q.optionImages) }));
 }
 
-// Muat semua kuis custom dari IndexedDB. Kunci "custom" (format lama, 1 kuis) ikut dibaca.
+// Indeks kuis custom: ringan (tanpa soal & gambar), satu kunci. Boot hanya membaca ini;
+// isi lengkap satu kuis dibaca saat kuis dibuka (loadCustomFull).
+const CUSTOM_INDEX_KEY = "cqindex";
+const customMeta = (rec, key) => ({ id: rec.id, title: rec.title, count: rec.questions.length, savedAt: rec.savedAt || 0, key });
+
+async function saveCustomIndex() {
+  const list = customQuizzes.filter((r) => !r.transient).map(({ transient, ...m }) => m);
+  await idb("readwrite", (st) => st.put(list, CUSTOM_INDEX_KEY)).catch(() => {});
+}
+
+// Migrasi sekali untuk instal lama: baca semua kuis (format lama) lalu bangun indeksnya.
+async function rebuildCustomIndex() {
+  const keys = await idb("readonly", (st) => st.getAllKeys());
+  const list = [];
+  for (const key of keys) {
+    if (!(key === "custom" || (typeof key === "string" && key.startsWith("cq:")))) continue;
+    const rec = await idb("readonly", (st) => st.get(key));
+    if (rec?.questions) list.push(customMeta({ ...rec, id: rec.id || "legacy" }, key));
+  }
+  return list;
+}
+
+// Muat indeks kuis custom saat boot. Kunci "custom" (format lama, 1 kuis) ikut terbaca lewat migrasi.
 async function loadCustom() {
   customQuizzes = [];
   try {
-    const keys = await idb("readonly", (st) => st.getAllKeys());
-    for (const key of keys) {
-      if (!(key === "custom" || (typeof key === "string" && key.startsWith("cq:")))) continue;
-      const rec = await idb("readonly", (st) => st.get(key));
-      if (rec?.questions) customQuizzes.push({ ...rec, id: rec.id || "legacy", key });
+    let list = await idb("readonly", (st) => st.get(CUSTOM_INDEX_KEY));
+    if (!Array.isArray(list)) {
+      list = await rebuildCustomIndex();
+      await idb("readwrite", (st) => st.put(list, CUSTOM_INDEX_KEY)).catch(() => {});
     }
-    customQuizzes.sort((a, b) => b.savedAt - a.savedAt);
+    customQuizzes = list.slice().sort((a, b) => b.savedAt - a.savedAt);
   } catch { /* IndexedDB diblokir → daftar kosong */ }
+}
+
+// Isi lengkap satu kuis (soal + gambar). Dipanggil saat kuis dimainkan, bukan saat boot.
+async function loadCustomFull(recId) {
+  const meta = customRec(recId);
+  if (!meta) return null;
+  return idb("readonly", (st) => st.get(meta.key)).catch(() => null);
 }
 
 // Pilih/seret satu atau beberapa file → konversi → simpan sebagai kuis baru (tidak menimpa kuis lain).
@@ -181,7 +210,8 @@ async function handleDocx(fileList) {
       const rec = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title: file.name.replace(/\.(docx|pdf)$/i, ""), questions, blobs, savedAt: Date.now() };
       let saved = true;
       await idb("readwrite", (st) => st.put(rec, "cq:" + rec.id)).catch(() => { saved = false; });
-      customQuizzes.unshift({ ...rec, key: "cq:" + rec.id });
+      customQuizzes.unshift({ ...customMeta(rec, "cq:" + rec.id), transient: !saved });
+      await saveCustomIndex();
       clearCustomProgress(rec.id);
       last = rec;
       const skipped = stats.skippedExt.length ? ` [warn] gambar .${stats.skippedExt.join(", .")} dilewati (browser tidak bisa menampilkan)` : "";
@@ -206,6 +236,7 @@ async function deleteCustom(recId) {
   customQuizzes = customQuizzes.filter((r) => r.id !== recId);
   clearCustomProgress(recId);
   await idb("readwrite", (st) => st.delete(rec.key)).catch(() => {});
+  await saveCustomIndex();
   if (wasActive) {
     allQuestions = [];
     activePackage = null;

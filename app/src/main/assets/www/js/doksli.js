@@ -54,3 +54,81 @@
     };
     window._dkOn = function() { return document.body.classList.contains("doksli") || document.body.classList.contains("koceng") || document.body.classList.contains("capy"); };
   })();
+
+// ── Stiker soal yang sudah dijawab (dipindah dari main.js) ─────────────
+  // Called after render() whenever in doksli mode
+  // Attaches meme stickers to revealed correct/wrong options
+  function doksliAttachStickers() {
+    if (!window._dkOn()) return;
+
+    // Remove existing stickers first
+    document.querySelectorAll(".doksli-sticker").forEach(el => el.remove());
+
+    // querySelectorAll, not querySelector: list-style modes can have several
+    // revealed questions on screen at once, so there can be more than one
+    // .option.correct/.wrong in the document at a time.
+    const correctOpts = document.querySelectorAll(".option.correct");
+    const wrongOpts   = document.querySelectorAll(".option.wrong");
+
+    const attach = (opt, corner) => {
+      const sticker = document.createElement("img");
+      sticker.className = "doksli-sticker";
+      sticker.src = window._dkImg();
+      sticker.setAttribute("aria-hidden", "true");
+      sticker.dataset.corner = corner;
+      opt.appendChild(sticker);
+    };
+    // Adding these <img> elements is itself a mutation inside #app, which the
+    // MutationObserver below watches — without disconnecting first, that
+    // observer re-fires on our own insert and keeps re-attaching forever,
+    // cycling window._dkImg() every cycle (the rapid "changing" look).
+    if (typeof _doksliMutObs !== "undefined") _doksliMutObs.disconnect();
+    correctOpts.forEach(opt => attach(opt, "tr"));
+    wrongOpts.forEach(opt => attach(opt, "br"));
+    const _dkApp = document.getElementById("app");
+    if (typeof _doksliMutObs !== "undefined" && _dkApp) {
+      _doksliMutObs.observe(_dkApp, { childList: true, subtree: true });
+    }
+
+    // Scroll fade: when sticker scrolls to within 56px of top of viewport, fade it
+    doksliUpdateStickerOpacity();
+  }
+
+  function doksliUpdateStickerOpacity() {
+    document.querySelectorAll(".doksli-sticker").forEach(sticker => {
+      const rect = sticker.closest(".option")?.getBoundingClientRect();
+      if (!rect) return;
+      const headerH = document.querySelector(".headerZone")?.offsetHeight || 56;
+      const clearance = rect.top - headerH;
+      // Full opacity when option is 80px+ below header, fade to 0.08 when overlapping
+      const opacity = clearance < 80
+        ? Math.max(0.08, clearance / 80)
+        : 1;
+      sticker.style.opacity = String(opacity);
+    });
+  }
+
+  // Scroll listener for fade
+  document.addEventListener("scroll", doksliUpdateStickerOpacity, { passive: true, capture: true });
+
+  const _doksliMutObs = new MutationObserver(() => {
+    if (window._dkOn()) {
+      // Debounce
+      clearTimeout(_doksliMutObs._t);
+      _doksliMutObs._t = setTimeout(doksliAttachStickers, 60);
+    }
+  });
+  document.addEventListener("DOMContentLoaded", () => {
+    const optionsContainer = document.getElementById("app");
+    if (optionsContainer) {
+      _doksliMutObs.observe(optionsContainer, { childList: true, subtree: true });
+    }
+  });
+  new MutationObserver(() => {
+    if (window._dkOn()) {
+      clearTimeout(window._doksliThemeT);
+      window._doksliThemeT = setTimeout(doksliAttachStickers, 80);
+    } else {
+      document.querySelectorAll(".doksli-sticker").forEach(el => el.remove());
+    }
+  }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
