@@ -4,6 +4,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Membuka installer untuk memasang update APK. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <!-- Hanya Android 7-9: untuk menyimpan APK update ke folder Download. -->
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"

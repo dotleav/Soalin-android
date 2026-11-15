@@ -38,12 +38,12 @@ object UpdateChecker {
     const val ACTION_DOWNLOAD = "com.dotleav.soalin.regular.UPDATE_DOWNLOAD"
     const val ACTION_LATER = "com.dotleav.soalin.regular.UPDATE_LATER"
 
-    private const val META_URL =
-        "https://raw.githubusercontent.com/dotleav/Soalin-android/master/app/release/output-metadata.json"
-    private const val APK_URL =
-        "https://github.com/dotleav/Soalin-android/raw/master/app/release/app-release.apk"
-    private const val SHA_URL =
-        "https://raw.githubusercontent.com/dotleav/Soalin-android/master/app/release/app-release.apk.sha256"
+    // Selalu menunjuk ke asset dari release terbaru (bukan prerelease).
+    private const val BASE =
+        "https://github.com/dotleav/Soalin-android/releases/latest/download/"
+    private const val META_URL = BASE + "output-metadata.json"
+    private const val APK_URL = BASE + "app-release.apk"
+    private const val SHA_URL = BASE + "app-release.apk.sha256"
     private val SHA_REGEX = Regex("[0-9a-f]{64}")
     private const val CHANNEL_ID = "soalin_update"
     private const val NOTIF_ID = 4101
@@ -107,14 +107,13 @@ object UpdateChecker {
 
     /**
      * Tampilkan notifikasi untuk update yang tertunda.
-     * Muncul sekali per versi, dan muncul lagi di pembukaan app berikutnya setelah "Lain kali".
+     * Muncul setiap app dibuka selama versi terpasang masih lebih lama dari release terbaru.
      * [ask] dipanggil untuk meminta izin runtime; hasilnya dikirim kembali ke MainActivity.
      */
     fun notifyIfPending(activity: Activity, ask: (String) -> Unit) {
         val prefs = activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val remoteCode = prefs.getInt("remote_code", 0)
         if (remoteCode <= BuildConfig.VERSION_CODE) return
-        if (prefs.getInt("notified_code", 0) == remoteCode) return
 
         if (Build.VERSION.SDK_INT >= 33 && !granted(activity, Manifest.permission.POST_NOTIFICATIONS)) {
             // Minta izin sekali per versi; kalau ditolak, tidak diminta lagi sampai versi baru.
@@ -136,7 +135,6 @@ object UpdateChecker {
         }
 
         post(activity, prefs.getString("remote_name", "") ?: "")
-        prefs.edit().putInt("notified_code", remoteCode).apply()
     }
 
     /** Tombol unduh di notifikasi: simpan APK dari repo ke folder Download. Unduhan diverifikasi saat selesai. */
@@ -189,9 +187,22 @@ object UpdateChecker {
             } catch (e: Exception) {
                 false
             }
-            if (!ok) dm.remove(id)
+            if (ok) install(ctx, id) else dm.remove(id)
             prefs.edit().remove("dl_id").remove("dl_sha").apply()
             toast(ctx, ctx.getString(if (ok) R.string.update_verified else R.string.update_bad_apk))
+        }
+    }
+
+    /** Buka installer sistem untuk APK yang sudah terverifikasi. Pemasangan tetap perlu persetujuan user. */
+    private fun install(ctx: Context, id: Long) {
+        val dm = ctx.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val uri = dm.getUriForDownloadedFile(id) ?: return
+        Handler(Looper.getMainLooper()).post {
+            ctx.startActivity(
+                Intent(Intent.ACTION_VIEW)
+                    .setDataAndType(uri, "application/vnd.android.package-archive")
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            )
         }
     }
 

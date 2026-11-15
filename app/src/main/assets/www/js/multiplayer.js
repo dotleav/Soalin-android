@@ -84,6 +84,49 @@ function mpInit() {
   return mpAuthPromise;
 }
 
+// Gambar kuis custom memakai blob: lokal yang tidak bisa dibuka perangkat lain.
+// Diubah jadi JPEG kecil (maks 1000px) sebagai data URL supaya ikut terkirim ke Firebase.
+const mpImgCache = new Map();
+async function mpShrink(src) {
+  try {
+    const blob = await (await fetch(src)).blob();
+    const bmp = await createImageBitmap(blob);
+    const k = Math.min(1, 1000 / Math.max(bmp.width, bmp.height));
+    const c = document.createElement("canvas");
+    c.width = Math.max(1, Math.round(bmp.width * k));
+    c.height = Math.max(1, Math.round(bmp.height * k));
+    const ctx = c.getContext("2d");
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.drawImage(bmp, 0, 0, c.width, c.height);
+    return c.toDataURL("image/jpeg", 0.8);
+  } catch {
+    return null;
+  }
+}
+async function mpSendable(src) {
+  if (typeof src !== "string" || !src) return null;
+  if (!src.startsWith("blob:")) return src; // URL http(s) bank atau data URL: langsung
+  if (!mpImgCache.has(src)) mpImgCache.set(src, await mpShrink(src));
+  return mpImgCache.get(src);
+}
+async function mpSendableList(list) {
+  const out = [];
+  for (const s of list || []) {
+    const v = await mpSendable(s);
+    if (v) out.push(v);
+  }
+  return out;
+}
+async function mpSendableOpt(o) {
+  const out = {};
+  for (const [L, s] of Object.entries(o || {})) {
+    const v = await mpSendable(s);
+    if (v) out[L] = v;
+  }
+  return out;
+}
+
 function mpGenCode() {
   let s = "";
   for (let i = 0; i < 4; i++) s += MP_CODE_CHARS[Math.floor(Math.random() * MP_CODE_CHARS.length)];
@@ -93,7 +136,7 @@ function mpGenCode() {
 // ── Host: buat room dari paket yang sedang aktif ─────────────────────────
 async function mpCreateRoom() {
   await mpInit();
-  if (!activePackage || activePackage.custom) throw new Error("Pilih paket soal biasa dulu (kuis custom belum didukung multiplayer)");
+  if (!activePackage) throw new Error("Pilih paket soal dulu");
   const qs = allQuestions.filter((q) => !q.isBroken && !q.isIsian);
   if (!qs.length) throw new Error("Paket ini tidak punya soal pilihan ganda");
   const cfg = DIFFICULTY_CONFIG[mpDiff] || DIFFICULTY_CONFIG.bekicot;
@@ -117,14 +160,15 @@ async function mpCreateRoom() {
 
   // Hanya teks, opsi, dan gambar soal yang dikirim. Kunci & penjelasan tidak ikut.
   const publicQs = {};
-  ordered.forEach((q, i) => {
+  for (let i = 0; i < ordered.length; i++) {
+    const q = ordered[i];
     publicQs[i] = {
       question: q.question || "",
       options: q.options || {},
-      optionImages: q.optionImages || {},
-      questionImages: (q.questionImages || []).filter((s) => typeof s === "string"),
+      optionImages: await mpSendableOpt(q.optionImages),
+      questionImages: await mpSendableList(q.questionImages),
     };
-  });
+  }
 
   await mpDb().ref().update({
     [`rooms/${code}/meta`]: {
@@ -157,7 +201,7 @@ async function mpVerifyCode(code) {
 
   if (meta.hostUid === mpUid) {
     const qs = allQuestions.filter((q) => !q.isBroken && !q.isIsian);
-    if (activePackage?.id !== meta.packageId || qs.length !== meta.count) {
+    if (activePackage?.title !== meta.title || qs.length !== meta.count) {
       throw new Error(`Buka paket "${meta.title}" dulu untuk masuk sebagai host`);
     }
     const order = mpArr(meta.order);
