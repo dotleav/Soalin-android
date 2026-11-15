@@ -15,7 +15,6 @@ import android.os.Build
 import android.os.Environment
 import android.os.Handler
 import android.os.Looper
-import android.widget.RemoteViews
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -244,22 +243,24 @@ object UpdateChecker {
                     CHANNEL_ID,
                     ctx.getString(R.string.update_channel),
                     NotificationManager.IMPORTANCE_DEFAULT
-                )
+                ).apply { description = ctx.getString(R.string.update_channel_desc) }
             )
         }
-        // Baris: [⬇] v1.7 [Lain kali]. Versi diisi dari repo setiap pengecekan.
-        val views = RemoteViews(ctx.packageName, R.layout.notif_update).apply {
-            setTextViewText(R.id.update_version, ctx.getString(R.string.update_version, versionName))
-            setOnClickPendingIntent(R.id.update_download, actionIntent(ctx, ACTION_DOWNLOAD, 1))
-            setOnClickPendingIntent(R.id.update_later, actionIntent(ctx, ACTION_LATER, 2))
-        }
+        val title = ctx.getString(R.string.update_title)
         val n = NotificationCompat.Builder(ctx, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.stat_sys_download_done)
-            .setContentTitle(ctx.getString(R.string.update_title))
+            .setSmallIcon(R.drawable.ic_stat_soalin)
+            .setColor(ContextCompat.getColor(ctx, R.color.notif_accent))
+            .setContentTitle(title)
             .setContentText(ctx.getString(R.string.update_text, versionName))
-            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            .setCustomContentView(views)
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .setBigContentTitle(title)
+                    .bigText(ctx.getString(R.string.update_text_big))
+            )
+            .setCategory(NotificationCompat.CATEGORY_RECOMMENDATION)
             .setContentIntent(actionIntent(ctx, ACTION_DOWNLOAD, 0))
+            .addAction(R.drawable.ic_update_download, ctx.getString(R.string.update_action_download), actionIntent(ctx, ACTION_DOWNLOAD, 1))
+            .addAction(0, ctx.getString(R.string.update_later), actionIntent(ctx, ACTION_LATER, 2))
             .setAutoCancel(true)
             .build()
         NotificationManagerCompat.from(ctx).notify(NOTIF_ID, n)
