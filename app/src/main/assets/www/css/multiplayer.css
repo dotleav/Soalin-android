@@ -13,7 +13,13 @@
 .mpPrimary:disabled, .mpSecondary:disabled { opacity: 0.6; cursor: default; }
 .mpError { color: var(--wrong-strong); font-size: 0.9rem; }
 .mpDivider { height: 1px; background: var(--border-light); margin: 4px 0; }
-.mpTop { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+.mpTop { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-light); }
+.mpTopInfo { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.mpTopTitle { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mpTopSub { font-size: 0.8rem; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+.mpTopSub .mpCode { font-size: 1rem; letter-spacing: 0.2em; color: var(--accent); }
+.mpExitBtn { flex: none; padding: 8px 12px; border-radius: var(--radius-md); background: transparent; color: var(--muted); border: 1px solid var(--border); font: inherit; font-weight: 700; font-size: 0.85rem; cursor: pointer; }
+.mpExitBtn.danger { color: var(--wrong-strong); border-color: var(--wrong-strong); }
 .mpCode { font-size: 1.8rem; font-weight: 700; letter-spacing: 0.3em; color: var(--accent); }
 .mpPlayers { display: flex; flex-wrap: wrap; gap: 6px; }
 .mpChip { background: var(--card-soft); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; font-size: 0.85rem; }
@@ -44,3 +50,14 @@
   60% { transform: scale(1.05); }
   100% { transform: scale(1); opacity: 1; }
 }
+
+/* Saat kuis berjalan, kartu luar dibuang: kartu soal tampil langsung seperti mode biasa. */
+.mpStage { background: none; border: none; box-shadow: none; padding: 0; gap: 16px; max-width: none; margin: 0; }
+.qCard .qText { white-space: pre-wrap; }
+.mpPanel { display: flex; flex-direction: column; gap: 10px; padding: 14px; background: var(--card-soft); border: 1px solid var(--border-light); border-radius: var(--radius-md); }
+.mpRows { display: flex; flex-direction: column; }
+.mpTallies { display: flex; flex-direction: column; gap: 6px; }
+.mpTally { display: flex; align-items: center; gap: 10px; }
+.mpTally > .letter { flex: none; }
+.mpTallyBar { position: relative; flex: 1; height: 10px; border-radius: 999px; background: var(--border-light); overflow: hidden; }
+.mpTallyBar .mpBar { border-radius: 999px; }

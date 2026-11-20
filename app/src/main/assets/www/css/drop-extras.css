@@ -1,10 +1,22 @@
 /* Kotak drop: daftar format yang didukung + link template di bawahnya. */
 .dropFormats { display: flex; flex-direction: column; gap: 2px; margin-top: 6px; font-size: 0.75rem; color: var(--muted2, var(--muted)); }
 .dropFormats code { font-family: "JetBrains Mono", monospace; font-size: 0.72rem; }
-.templateLink { display: block; text-align: center; margin: 10px 0 4px; font-size: 0.84rem; font-weight: 600; color: var(--accent); text-decoration: underline; }
+.templateLink { display: flex; justify-content: center; margin: 10px 0 4px; font-size: 1.2rem; color: var(--accent); text-decoration: none; }
 
 /* Daftar banyak kuis custom: baris kuis + tombol hapus di sebelahnya. */
 .customRow { display: flex; gap: 6px; align-items: stretch; margin-bottom: 6px; }
 .customRow .packageItem { flex: 1; min-width: 0; }
 .customDelBtn { flex: none; padding: 0 10px; }
 .dropMsg { white-space: pre-line; }
+
+/* Mode pilih banyak kuis custom (tekan tahan baris): kotak centang + sorot baris terpilih. */
+.customRow .packageItem { position: relative; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.selBox {
+  position: absolute; left: 8px; top: 50%; transform: translateY(-50%); pointer-events: none;
+  width: 1.1em; height: 1.1em; display: inline-flex; align-items: center; justify-content: center;
+  border: 2px solid var(--muted2, var(--muted)); border-radius: 4px; color: var(--accent); font-size: 0.8rem;
+}
+.customRow.picked .selBox { border-color: var(--accent); background: var(--accent-soft); }
+.customRow.picked .packageItem { background: var(--accent-soft); }
+.customSelBar { flex-wrap: wrap; }
+#customSelDelBtn:disabled { opacity: 0.45; cursor: default; }

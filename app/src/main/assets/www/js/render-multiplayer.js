@@ -80,7 +80,7 @@ function renderMpRoom() {
     return `
       <main class="wrap">
         <div class="mpCard">
-          <p class="mpSub">Memuat room\u2026</p>
+          <p class="mpSub">Memuat room…</p>
           ${mpErrorHtml()}
           <button class="mpLinkBtn" data-mp-act="leave">Keluar</button>
         </div>
@@ -88,14 +88,22 @@ function renderMpRoom() {
   }
 
   const phase = mpRoom.state?.phase || "lobby";
-  const myName = mpIsHost ? svgIcon("crown") + " Host" : escapeHtml(mpRoom.players?.[mpUid]?.name || "");
+  const stage = phase === "playing";
+  // Kode room hanya untuk host (dibagikan ke pemain). Pemain tidak melihat kode saat mengerjakan.
+  const title = mpRoom.meta.title ? ` · ${escapeHtml(mpRoom.meta.title)}` : "";
+  const who = mpIsHost
+    ? `${svgIcon("crown")} Host · kode <span class="mpCode mono">${mpRoomCode}</span>`
+    : escapeHtml(mpRoom.players?.[mpUid]?.name || "");
+  // Tombol keluar/tutup ada di header, jauh dari navigasi soal di bawah.
   const header = `
     <div class="mpTop">
-      <div>
-        <div class="mpSub">Kode room</div>
-        <div class="mpCode mono">${mpRoomCode}</div>
+      <div class="mpTopInfo">
+        <div class="mpTopTitle">${svgIcon("gamepad")} Multiplayer${title}</div>
+        <div class="mpTopSub">${who}</div>
       </div>
-      <div class="mpSub">${myName}</div>
+      ${mpIsHost
+        ? `<button class="mpExitBtn danger" data-mp-act="close">Tutup room</button>`
+        : `<button class="mpExitBtn" data-mp-act="leave">Keluar</button>`}
     </div>`;
 
   let body = "";
@@ -103,17 +111,12 @@ function renderMpRoom() {
   else if (phase === "ended") body = renderMpEnded();
   else body = mpRoom.meta?.cbt ? renderMpCbtPlaying() : renderMpPlaying() + mpReviewBarHtml();
 
-  const footer = mpIsHost
-    ? `<button class="mpDanger" data-mp-act="close">Tutup room</button>`
-    : `<button class="mpLinkBtn" data-mp-act="leave">Keluar room</button>`;
-
   return `
     <main class="wrap">
-      <div class="mpCard">
+      <div class="mpCard${stage ? " mpStage" : ""}">
         ${header}
         ${mpErrorHtml()}
         ${body}
-        <div class="mpFooter">${footer}</div>
       </div>
     </main>`;
 }
@@ -138,7 +141,7 @@ function renderMpPlaying() {
   if (mpReviewCur !== rvKey) { mpReviewCur = rvKey; mpReviewIdx = null; mpReviewListOpen = false; }
   if (mpReviewIdx !== null) return mpReviewViewerHtml(mpReviewIdx);
   const q = mpRoom.questions[i];
-  if (!q) return `<p class="mpSub">Memuat soal\u2026</p>`;
+  if (!q) return `<p class="mpSub">Memuat soal…</p>`;
 
   const total = mpRoom.meta.count;
   const rev = mpRoom.reveal?.[i];
@@ -157,26 +160,15 @@ function renderMpPlaying() {
     <div class="mpTimer mono">${mpTimerText(rem)}</div>
     <div class="mpTimerTrack"><div class="mpTimerFill" style="width:${(rem / mpLimitMs()) * 100}%"></div></div>` : "";
 
-  const options = letters.map((l) => {
-    const cls = ["option", "mpOpt"];
-    if (rev) {
-      if (l === rev.answer) cls.push("correct");
-      else if (l === my) cls.push("wrong");
-    }
-    if (!mpIsHost && my === l) cls.push("selected");
-    const disabled = mpIsHost || rev || my !== undefined || timedOut;
-    const pct = playerCount ? Math.round(((pickCount[l] || 0) / playerCount) * 100) : 0;
-    return `
-      <button class="${cls.join(" ")}" data-mp-act="answer" data-letter="${l}" ${disabled ? "disabled" : ""}>
-        ${mpIsHost ? `<span class="mpBar" style="width:${pct}%"></span>` : ""}
-        <span class="letter">${l}</span>
-        <span class="optBody">${q.optionImages?.[l] ? optionImageHtml(q.optionImages[l]) : ""}${q.options[l] ? `<span class="optText">${escapeHtml(q.options[l])}</span>` : ""}</span>
-        ${mpIsHost ? `<span class="mpCount mono">${pickCount[l] || 0}</span>` : ""}
-      </button>`;
-  }).join("");
-
-  const qImgs = (q.questionImages || []).map((src) => `<img class="qImg" src="${escapeAttr(src)}" alt="gambar soal">`).join("");
-  const eImgs = (rev?.explanationImages || []).map((src) => `<img class="exImg" src="${escapeAttr(src)}" alt="gambar penjelasan">`).join("");
+  // Kartu soal memakai komponen yang sama dengan Mode Tentamen. Kunci jawaban hanya
+  // ikut setelah dibuka (rev). "" = belum menjawab, tapi kunci tetap disorot saat dibuka.
+  const qv = rev ? { ...q, answer: rev.answer, explanation: rev.explanation, explanationImages: rev.explanationImages } : q;
+  const chosen = my === undefined ? (rev ? "" : undefined) : my;
+  const card = renderQuestionCard(qv, i + 1, chosen, !!rev, {
+    free: false,
+    lock: !!rev || timedOut || mpIsHost,
+    optAttrs: mpIsHost ? "" : `data-mp-act="answer"`,
+  });
 
   let feedback = "";
   if (!mpIsHost) {
@@ -185,38 +177,40 @@ function renderMpPlaying() {
       else if (my === rev.answer) feedback = `<div class="mpFeedback ok">${svgIcon("check")} Benar!</div>`;
       else feedback = `<div class="mpFeedback bad">${svgIcon("close")} Salah. Jawaban yang benar: <b>${escapeHtml(rev.answer)}</b></div>`;
     } else if (my !== undefined) {
-      feedback = `<div class="mpFeedback">Jawabanmu terkirim. Menunggu jawaban dibuka\u2026</div>`;
+      feedback = `<div class="mpFeedback">Jawabanmu terkirim. Menunggu jawaban dibuka…</div>`;
     } else if (timedOut) {
-      feedback = `<div class="mpFeedback">Waktu habis. Menunggu jawaban dibuka\u2026</div>`;
+      feedback = `<div class="mpFeedback">Waktu habis. Menunggu jawaban dibuka…</div>`;
     }
   }
-  const explain = rev?.explanation ? `<div class="mpExplain">${escapeHtml(rev.explanation)}</div>` : "";
 
-  let hostControls = "";
+  let hostPanel = "";
   if (mpIsHost) {
     const names = Object.entries(picks)
       .map(([uid, l]) => `${escapeHtml(mpRoom.players?.[uid]?.name || "?")} ${svgIcon("chevron-right")} ${l}`)
-      .join(" \u00B7 ");
-    hostControls = `
-      <div class="mpHostInfo mono">${answeredCount}/${playerCount} sudah menjawab</div>
-      <div class="mpPlayers">${mpPlayerList(true)}</div>
-      ${names ? `<div class="mpSub mpPicks">${names}</div>` : ""}
-      ${timed ? `<div class="mpSub">Otomatis: jawaban dibuka saat waktu habis.</div>` : ""}
-      ${rev
-        ? `<button class="mpPrimary" data-mp-act="next">${i + 1 < total ? "Soal berikutnya " + svgIcon("chevron-right") : "Selesai · lihat skor"}</button>`
-        : `<button class="mpPrimary" data-mp-act="reveal">${svgIcon("eye")} Tampilkan jawaban</button>`}`;
+      .join(" · ");
+    const tally = letters.map((l) => {
+      const pct = playerCount ? Math.round(((pickCount[l] || 0) / playerCount) * 100) : 0;
+      return `<div class="mpTally"><span class="letter">${l}</span><span class="mpTallyBar"><span class="mpBar" style="width:${pct}%"></span></span><span class="mpCount mono">${pickCount[l] || 0}</span></div>`;
+    }).join("");
+    hostPanel = `
+      <div class="mpPanel">
+        <div class="mpHostInfo mono">${answeredCount}/${playerCount} sudah menjawab</div>
+        <div class="mpTallies">${tally}</div>
+        ${names ? `<div class="mpSub mpPicks">${names}</div>` : ""}
+        <div class="mpPlayers">${mpPlayerList(true)}</div>
+        ${timed ? `<div class="mpSub">Otomatis: jawaban dibuka saat waktu habis.</div>` : ""}
+        ${rev
+          ? `<button class="mpPrimary" data-mp-act="next">${i + 1 < total ? "Soal berikutnya " + svgIcon("chevron-right") : "Selesai · lihat skor"}</button>`
+          : `<button class="mpPrimary" data-mp-act="reveal">${svgIcon("eye")} Tampilkan jawaban</button>`}
+      </div>`;
   }
 
   return `
     <div class="mpProgress mono">Soal ${i + 1} / ${total}</div>
     ${timerHtml}
-    <div class="mpQuestion">${escapeHtml(q.question)}</div>
-    ${qImgs}
-    <div class="options">${options}</div>
+    ${card}
     ${feedback}
-    ${eImgs}
-    ${explain}
-    ${hostControls}`;
+    ${hostPanel}`;
 }
 
 function renderMpEnded() {
@@ -233,57 +227,81 @@ function renderMpEnded() {
     <p class="mpSub">Tunggu host menutup room.</p>`;
 }
 
-// ── Multiplayer CBT: tampilan saat paket dikerjakan (host: pantau; pemain: kerjakan) ──
+// ── Multiplayer CBT: tampilan saat paket dikerjakan ───────────────────────
+// Susunan sama dengan CBT biasa: bar waktu, kartu soal, navigasi di bawah kartu,
+// daftar nomor, lalu Selesai di paling bawah. Keluar room ada di header.
+function mpCbtTopHtml(rem, qOf) {
+  const timedOut = rem === 0;
+  const urgent = rem !== null && rem <= 60000 && !timedOut;
+  const timer = rem !== null ? `
+    <div class="cbtTimer${urgent ? " urgent" : ""}${timedOut ? " expired" : ""}">
+      <span class="cbtTimerLbl">${timedOut ? "Waktu habis" : "Sisa waktu paket"}</span>
+      <span class="cbtTimerNum mono">${mpTimerText(rem)}</span>
+    </div>` : "";
+  const limit = mpLimitMs();
+  const pct = rem !== null && limit ? (rem / limit) * 100 : 0;
+  const track = rem !== null ? `<div class="cbtTrack"><div class="cbtTrackFill" style="width:${pct}%"></div></div>` : "";
+  return `
+    <div class="cbtTopBar">
+      ${timer}
+      <div class="cbtQOf">${qOf}</div>
+    </div>
+    ${track}`;
+}
+
 function renderMpCbtPlaying() {
   const total = mpRoom.meta.count;
   const rem = mpRemaining();
   const timedOut = rem === 0;
-  const timerHtml = rem !== null ? `
-    <div class="mpTimer mono">${mpTimerText(rem)}</div>
-    <div class="mpTimerTrack"><div class="mpTimerFill" style="width:${(rem / mpLimitMs()) * 100}%"></div></div>` : "";
   const players = Object.entries(mpRoom.players || {});
   const doneCount = players.filter(([, p]) => p.done).length;
-  let body;
+  const cbtColor = DIFFICULTY_CONFIG.cbt.color;
+
   if (mpIsHost) {
     const rows = players.map(([uid, p]) => {
       const n = Object.values(mpRoom.answers || {}).filter((a) => a && a[uid] !== undefined).length;
       return `<div class="mpRow"><span>${escapeHtml(p.name)}</span><span class="mono">${n}/${total}${p.done ? " · selesai" : ""}</span></div>`;
     }).join("");
-    body = `
-      <div class="mpHostInfo mono">${doneCount}/${players.length} pemain selesai</div>
-      <div class="mpPlayers">${mpPlayerList(false)}</div>
-      ${rows}
-      <button class="mpPrimary" data-mp-act="cbtend">${svgIcon("eye")} Akhiri dan buka jawaban</button>`;
-  } else {
-    const i = Math.min(mpCbtIdx, total - 1);
-    const q = mpRoom.questions[i];
-    const my = mpMyAnswers[i];
-    const done = !!mpRoom.players?.[mpUid]?.done;
-    const locked = timedOut || done;
-    const grid = Array.from({ length: total }, (_, k) =>
-      `<button class="cbtNum${k === i ? " current" : ""}${mpMyAnswers[k] !== undefined ? " done" : ""}" data-mp-act="cbtjump" data-idx="${k}" aria-label="Soal ${k + 1}">${k + 1}</button>`).join("");
-    const opts = Object.keys(q?.options || {}).sort().map((l) => `
-      <button class="option mpOpt${my === l ? " selected" : ""}" data-mp-act="answer" data-letter="${l}" ${locked ? "disabled" : ""}>
-        <span class="letter">${l}</span>
-        <span class="optBody">${q.optionImages?.[l] ? optionImageHtml(q.optionImages[l]) : ""}${q.options[l] ? `<span class="optText">${escapeHtml(q.options[l])}</span>` : ""}</span>
-      </button>`).join("");
-    const qImgs = (q?.questionImages || []).map((src) => `<img class="qImg" src="${escapeAttr(src)}" alt="gambar soal">`).join("");
-    const status = timedOut ? `<div class="mpFeedback">Waktu paket habis. Jawaban dikunci.</div>`
-      : done ? `<div class="mpFeedback ok">${svgIcon("check")} Kamu sudah selesai. Menunggu pemain lain…</div>` : "";
-    body = `
-      <div class="mpProgress mono">Soal ${i + 1} / ${total} · dijawab ${Object.keys(mpMyAnswers).length}/${total}</div>
-      <div class="cbtGrid">${grid}</div>
-      <div class="mpQuestion">${escapeHtml(q?.question || "")}</div>
-      ${qImgs}
-      <div class="options">${opts}</div>
-      <div style="display:flex;justify-content:space-between;gap:8px;">
-        <button class="mpLinkBtn" data-mp-act="cbtstep" data-d="-1" ${i === 0 ? "disabled" : ""}>${svgIcon("chevron-left")} Sebelumnya</button>
-        <button class="mpLinkBtn" data-mp-act="cbtstep" data-d="1" ${i >= total - 1 ? "disabled" : ""}>Berikutnya ${svgIcon("chevron-right")}</button>
-      </div>
-      ${status}
-      ${locked ? "" : `<button class="mpPrimary" data-mp-act="cbtdone">${svgIcon("check")} Selesai</button>`}`;
+    return `
+      <div style="--cbt:${cbtColor};">
+        ${mpCbtTopHtml(rem, `Pemain ${players.length}`)}
+        <div class="mpPanel">
+          <div class="mpHostInfo mono">${doneCount}/${players.length} pemain selesai</div>
+          <div class="mpPlayers">${mpPlayerList(false)}</div>
+          <div class="mpRows">${rows}</div>
+          <button class="mpPrimary" data-mp-act="cbtend">${svgIcon("eye")} Akhiri dan buka jawaban</button>
+        </div>
+      </div>`;
   }
-  return `<div style="--cbt:${DIFFICULTY_CONFIG.cbt.color};">${timerHtml}${body}</div>`;
+
+  const i = Math.min(mpCbtIdx, total - 1);
+  const q = mpRoom.questions[i];
+  const my = mpMyAnswers[i];
+  const done = !!mpRoom.players?.[mpUid]?.done;
+  const locked = timedOut || done;
+  let answered = 0;
+  for (let k = 0; k < total; k++) if (mpMyAnswers[k] !== undefined) answered++;
+
+  const grid = Array.from({ length: total }, (_, k) =>
+    `<button class="cbtNum${k === i ? " current" : ""}${mpMyAnswers[k] !== undefined ? " done" : ""}" data-mp-act="cbtjump" data-idx="${k}" aria-label="Soal ${k + 1}">${k + 1}</button>`).join("");
+  const card = q ? renderQuestionCard(q, i + 1, my, false, { free: !locked, lock: locked, optAttrs: `data-mp-act="answer"` }) : "";
+  const status = timedOut ? `<div class="timeoutNotice">${svgIcon("warning")} <span>Waktu paket habis. Jawaban dikunci.</span></div>`
+    : done ? `<div class="mpFeedback ok">${svgIcon("check")} Kamu sudah selesai. Menunggu pemain lain…</div>` : "";
+  const submit = locked ? "" : `<div class="cbtSubmitSlot"><button class="startTentamenBtn cbtSubmitBtn" data-mp-act="cbtdone" style="background:${cbtColor};">${svgIcon("check")} Selesai</button></div>`;
+
+  return `
+    <div class="cbtWrap" style="--cbt:${cbtColor};">
+      ${mpCbtTopHtml(rem, `Soal <span class="mono">${i + 1}</span> dari <span class="mono">${total}</span>`)}
+      ${status}
+      ${card}
+      <div class="cbtNavRow">
+        <button class="cbtArrow iconBtn" data-mp-act="cbtstep" data-d="-1" aria-label="Sebelumnya" title="Sebelumnya" ${i === 0 ? "disabled" : ""}>${svgIcon("chevron-left")} <span class="lbl">Sebelumnya</span></button>
+        <button class="cbtArrow iconBtn" data-mp-act="cbtstep" data-d="1" aria-label="Berikutnya" title="Berikutnya" ${i >= total - 1 ? "disabled" : ""}><span class="lbl">Berikutnya</span> ${svgIcon("chevron-right")}</button>
+      </div>
+      <div class="cbtGridHead"><span class="v2hide">Daftar soal</span><span class="mono">${answered}/${total}<span class="v2hide"> dijawab</span></span></div>
+      <div class="cbtGrid">${grid}</div>
+      ${submit}
+    </div>`;
 }
 
 // Pemain setelah sesi CBT selesai: skor dan daftar tinjauan semua soal.

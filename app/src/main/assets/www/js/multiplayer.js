@@ -60,11 +60,12 @@ function mpTick() {
     if (mpExpiredIdx !== idx) { mpExpiredIdx = idx; render(); }
     return;
   }
-  const timerEl = document.querySelector(".mpTimer");
+  const timerEl = document.querySelector(".mpTimer, .cbtTimerNum");
   if (!timerEl) return;
   timerEl.textContent = mpTimerText(rem);
-  const fillEl = document.querySelector(".mpTimerFill");
+  const fillEl = document.querySelector(".mpTimerFill, .cbtTrackFill");
   if (fillEl) fillEl.style.width = `${(rem / mpLimitMs()) * 100}%`;
+  document.querySelector(".cbtTimer")?.classList.toggle("urgent", rem <= 60000);
 }
 
 function mpInit() {
@@ -501,13 +502,21 @@ async function mpAct(act, el) {
         break;
       case "cbtjump": mpCbtIdx = Number(el.dataset.idx); break;
       case "cbtstep": mpCbtIdx = Math.min(mpRoom.meta.count - 1, Math.max(0, mpCbtIdx + Number(el.dataset.d))); break;
-      case "cbtdone":
-        if (confirm("Selesai? Jawaban tidak bisa diubah lagi.")) await mpDb().ref(`rooms/${mpRoomCode}/players/${mpUid}/done`).set(true);
+      case "cbtdone": {
+        let kosong = 0;
+        for (let k = 0; k < mpRoom.meta.count; k++) if (mpMyAnswers[k] === undefined) kosong++;
+        const tanya = kosong
+          ? `Masih ada ${kosong} soal belum dijawab. Selesai sekarang? Jawaban tidak bisa diubah lagi.`
+          : "Selesai? Jawaban tidak bisa diubah lagi.";
+        if (confirm(tanya)) await mpDb().ref(`rooms/${mpRoomCode}/players/${mpUid}/done`).set(true);
         break;
+      }
       case "cbtend":
         if (confirm("Akhiri sekarang? Semua jawaban dibuka.")) await mpHostEndCbt();
         break;
-      case "leave": mpLeave(); render(); return;
+      case "leave":
+        if (!mpIsHost && mpRoom.state?.phase === "playing" && !confirm("Keluar dari room saat kuis sedang berjalan?")) return;
+        mpLeave(); render(); return;
       case "answer": mpAnswer(el.dataset.letter); return;
     }
   } catch (e) {

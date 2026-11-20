@@ -14,6 +14,8 @@ const ICON_PATHS = {
   key: '<circle cx="8" cy="12" r="3.5"/><path d="M11.5 12H20M17 12v3.2M14 12v2.4"/>',
   skip: '<path d="M5 6.5 12.5 12 5 17.5z"/><path d="M19 6v12"/>',
   trash: '<path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2L17.5 7"/>',
+  select: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12.2l2.4 2.4 4.6-4.8"/>',
+  download: '<path d="M12 4.5v10.5M7.5 10.8 12 15.3l4.5-4.5"/><path d="M5 19.5h14"/>',
   list: '<path d="M9.5 6.5H20M9.5 12H20M9.5 17.5H20"/><circle cx="5" cy="6.5" r=".8"/><circle cx="5" cy="12" r=".8"/><circle cx="5" cy="17.5" r=".8"/>',
   speaker: '<path d="M4.5 9.5h3.2L12.5 5.5v13l-4.8-4H4.5z"/><path d="M15.8 9a4.2 4.2 0 0 1 0 6M18.6 6.5a7.8 7.8 0 0 1 0 11"/>',
   "speaker-off": '<path d="M4.5 9.5h3.2L12.5 5.5v13l-4.8-4H4.5z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/>',

@@ -37,6 +37,8 @@ const CUSTOM_PREFIX = "custom:"; // id paket custom = CUSTOM_PREFIX + id kuis
 let customQuizzes = []; // [{ id, title, questions, blobs, savedAt, key }] — semua kuis custom tersimpan
 let customUrls = []; // object URL gambar kuis custom (di-revoke saat ganti/hapus)
 let dropMsg = ""; // pesan status konversi/hapus di kartu Custom Quiz
+let customSelect = null; // id kuis custom yang dipilih (mode pilih banyak); null = mode biasa
+let customSuppressClick = false; // klik sisa dari tekan tahan diabaikan
 
 // ── State ──────────────────────────────────────────────────────────────────
 let quizMode = "biasa"; // "biasa" | "tentamen"
@@ -229,13 +231,17 @@ async function handleDocx(fileList) {
   render();
 }
 
-async function deleteCustom(recId) {
-  const rec = customRec(recId);
-  if (!rec || !confirm(`Hapus kuis custom "${rec.title}"?\nProgresnya ikut hilang.`)) return;
-  const wasActive = activePackage?.id === CUSTOM_PREFIX + recId;
-  customQuizzes = customQuizzes.filter((r) => r.id !== recId);
-  clearCustomProgress(recId);
-  await idb("readwrite", (st) => st.delete(rec.key)).catch(() => {});
+// Hapus satu atau banyak kuis custom sekaligus. Konfirmasi diminta pemanggil.
+async function deleteCustoms(recIds) {
+  const recs = recIds.map((id) => customRec(id)).filter(Boolean);
+  if (!recs.length) return;
+  const gone = new Set(recs.map((r) => r.id));
+  const wasActive = isCustomId(activePackage?.id) && gone.has(activePackage.id.slice(CUSTOM_PREFIX.length));
+  customQuizzes = customQuizzes.filter((r) => !gone.has(r.id));
+  for (const rec of recs) {
+    clearCustomProgress(rec.id);
+    await idb("readwrite", (st) => st.delete(rec.key)).catch(() => {});
+  }
   await saveCustomIndex();
   if (wasActive) {
     allQuestions = [];
@@ -243,9 +249,15 @@ async function deleteCustom(recId) {
     try { localStorage.removeItem(ACTIVE_PKG_KEY); } catch { /* noop */ }
     resetQuizStateForNewPackage();
   }
-  dropMsg = "[del] Kuis custom dihapus.";
+  dropMsg = recs.length === 1 ? "[del] Kuis custom dihapus." : `[del] ${recs.length} kuis custom dihapus.`;
   pickerOpen = true;
   render();
+}
+
+async function deleteCustom(recId) {
+  const rec = customRec(recId);
+  if (!rec || !confirm(`Hapus kuis custom "${rec.title}"?\nProgresnya ikut hilang.`)) return;
+  await deleteCustoms([recId]);
 }
 
 // Seret-lepas di mana saja di halaman (preventDefault supaya browser tidak membuka file-nya).

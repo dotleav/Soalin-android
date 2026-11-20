@@ -138,7 +138,7 @@ function renderQuestionCard(q, qNum, chosen, revealAnswer, opts = {}) {
     const expHtml = (showState && oExp[letter]) ? `<span class="optExp">${expTag}${escapeHtml(oExp[letter])}</span>` : "";
 
     return `
-      <button class="${cls}${locked}" data-qid="${escapeAttr(q.id)}" data-letter="${escapeAttr(letter)}">
+      <button class="${cls}${locked}" data-qid="${escapeAttr(q.id)}" data-letter="${escapeAttr(letter)}" ${opts.optAttrs || ""}>
         <span class="${letterCls}" data-letter="${letter}">${(window._dkOn() && window._dkImg) ? `<img class="doksli-letter-img" src="${window._dkImg()}" aria-hidden="true">` : letter}</span>
         <span class="optBody">
           ${imgSrc ? optionImageHtml(imgSrc) : ""}

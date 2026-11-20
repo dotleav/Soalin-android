@@ -67,37 +67,91 @@ function renderSettingsCard() {
   `;
 }
 
-// ── Render: kartu Custom Quiz (1 slot) — di paling atas layar pilih paket ──
+// ── Render: kartu Custom Quiz — di paling atas layar pilih paket ──
+// Tekan tahan satu kuis → mode pilih banyak (kotak centang, Pilih semua, Hapus terpilih).
 function renderCustomCard() {
+  const selecting = customSelect !== null;
+  const picked = customSelect || new Set();
   const list = customQuizzes.map((rec) => {
     const id = CUSTOM_PREFIX + rec.id;
-    const active = activePackage?.id === id;
+    const active = !selecting && activePackage?.id === id;
+    const on = picked.has(rec.id);
     return `
-        <div class="customRow">
-          <button class="packageItem${active ? " active" : ""}" data-pkg="${escapeAttr(id)}">
+        <div class="customRow${selecting ? " selecting" : ""}${on ? " picked" : ""}">
+          <button class="packageItem${active ? " active" : ""}" data-pkg="${escapeAttr(id)}" data-rec="${escapeAttr(rec.id)}">
+            ${selecting ? `<span class="selBox" aria-hidden="true">${on ? svgIcon("check") : ""}</span>` : ""}
             <span class="pkgTitle">${escapeHtml(rec.title)}</span>
             <span class="pkgMeta">${rec.count} soal \u00B7 ${formatDateShort(rec.savedAt)}</span>
           </button>
-          <button class="resetBtn customDelBtn" data-del-custom="${escapeAttr(rec.id)}" title="Hapus kuis">${svgIcon("trash")}</button>
+          ${selecting ? "" : `<button class="resetBtn customDelBtn" data-del-custom="${escapeAttr(rec.id)}" title="Hapus kuis">${svgIcon("trash")}</button>`}
         </div>`;
   }).join("");
+  const allOn = customQuizzes.length > 0 && picked.size === customQuizzes.length;
+  const head = selecting
+    ? `<div class="customHead customSelBar">
+        <span class="catName">${svgIcon("select")} ${picked.size}</span>
+        <button class="atBulkBtn" id="customSelAllBtn">${allOn ? "Unselect" : "Select all"}</button>
+        <button class="atBulkBtn" id="customSelDelBtn" title="Hapus terpilih" aria-label="Hapus terpilih" ${picked.size ? "" : "disabled"}>${svgIcon("trash")}</button>
+      </div>`
+    : `<div class="customHead">
+        <span class="catName">Custom Quiz (${customQuizzes.length})</span>
+        ${customQuizzes.length > 1 ? `<span class="catMeta" title="Tekan lama untuk pilih banyak" aria-label="Tekan lama untuk pilih banyak">${svgIcon("select")}</span>` : ""}
+      </div>`;
   return `
     <div class="categoryGroup">
-      <div class="customHead">
-        <span class="catName">Custom Quiz (${customQuizzes.length})</span>
-        <span class="catMeta">-</span>
-      </div>
+      ${head}
       <input type="file" id="docxInput" accept=".docx,.pdf" multiple hidden>
       ${list}
-      <label class="dropZone" for="docxInput">
+      <label class="dropZone" for="docxInput" title="Drag and drop atau klik" aria-label="Drag and drop atau klik">
         <span class="dropIcon">${svgIcon("document")}</span>
-        <span class="dropTitle">Drag and drop</span>
         <span class="dropFormats"><code>.docx</code><code>.pdf</code></span>
       </label>
-      <a class="templateLink" href="https://drive.google.com/drive/folders/1WSxodjrD3jGzQKj0DBROVTUo7I5iBAun?usp=sharing" target="_blank" rel="noopener">Download template disini</a>
+      <a class="templateLink" href="https://drive.google.com/drive/folders/1WSxodjrD3jGzQKj0DBROVTUo7I5iBAun?usp=sharing" target="_blank" rel="noopener" title="Download template" aria-label="Download template">${svgIcon("download")}</a>
       ${dropMsg ? `<div class="dropMsg">${markedMsgHtml(dropMsg)}</div>` : ""}
     </div>`;
 }
+
+function startCustomSelect(recId) {
+  if (!customSelect) customSelect = new Set();
+  customSelect.add(recId);
+  render();
+}
+
+function toggleCustomPick(recId) {
+  if (customSelect.has(recId)) customSelect.delete(recId);
+  else customSelect.add(recId);
+  render();
+}
+
+async function deleteSelectedCustoms() {
+  const ids = [...customSelect];
+  if (!ids.length || !confirm(`Hapus ${ids.length} kuis custom?\nProgresnya ikut hilang.`)) return;
+  customSelect = null;
+  await deleteCustoms(ids);
+}
+
+// Tekan tahan kuis custom memakai SATU timer global, dibatalkan di pointerup/pointercancel
+// mana pun. Sengaja tidak per-tombol: DOM baris bisa dibangun ulang di tengah tekanan.
+// Klik sisa dari tekan tahan diabaikan; flag di-reset tiap sentuhan baru.
+let customPressTimer = 0;
+const cancelCustomPress = () => clearTimeout(customPressTimer);
+addEventListener("pointerdown", () => { customSuppressClick = false; cancelCustomPress(); }, true);
+addEventListener("pointerup", cancelCustomPress, true);
+addEventListener("pointercancel", cancelCustomPress, true);
+// Jari bergeser lebih dari 10px atau layar di-scroll → tekan tahan dibatalkan.
+let customPressX = 0, customPressY = 0;
+addEventListener("pointerdown", (e) => { customPressX = e.clientX; customPressY = e.clientY; }, true);
+addEventListener("pointermove", (e) => {
+  if (Math.hypot(e.clientX - customPressX, e.clientY - customPressY) > 10) cancelCustomPress();
+}, true);
+addEventListener("scroll", cancelCustomPress, true);
+// Tap di luar baris kuis custom dan bar pilih → keluar mode pilih banyak.
+document.addEventListener("click", (e) => {
+  if (customSelect === null) return;
+  if (e.target.closest && e.target.closest(".customRow, .customSelBar")) return;
+  customSelect = null;
+  render();
+});
 
 function renderPickerScreen() {
   const grouped = {};
@@ -159,9 +213,12 @@ function attachPickerHandlers() {
   });
   app.querySelectorAll(".packageItem[data-pkg]").forEach((btn) => {
     btn.addEventListener("click", async () => {
+      if (customSuppressClick) { customSuppressClick = false; return; }
+      if (customSelect !== null) { if (btn.dataset.rec) toggleCustomPick(btn.dataset.rec); return; }
       const pkg = isCustomId(btn.dataset.pkg) ? customPkg(customRec(btn.dataset.pkg.slice(CUSTOM_PREFIX.length))) : packageManifest.find((p) => p.id === btn.dataset.pkg);
       if (!pkg) return;
       const proceed = async () => {
+        customSelect = null;
         await selectPackage(pkg);
         pickerOpen = false;
         render();
@@ -175,12 +232,27 @@ function attachPickerHandlers() {
     });
   });
   const closeBtn = document.getElementById("pickerCloseBtn");
-  if (closeBtn) closeBtn.addEventListener("click", () => { pickerOpen = false; render(); });
+  if (closeBtn) closeBtn.addEventListener("click", () => { customSelect = null; pickerOpen = false; render(); });
   attachAnswertoneHandlers();
 
   const docxInput = document.getElementById("docxInput");
   docxInput.addEventListener("change", (e) => handleDocx(e.target.files));
   app.querySelectorAll("[data-del-custom]").forEach((btn) => btn.addEventListener("click", () => deleteCustom(btn.dataset.delCustom)));
+  // Tekan tahan (±500 ms) baris kuis custom → mode pilih banyak, kuis itu langsung terpilih.
+  app.querySelectorAll(".customRow .packageItem[data-rec]").forEach((btn) => {
+    btn.addEventListener("pointerdown", () => {
+      customPressTimer = setTimeout(() => { customSuppressClick = true; startCustomSelect(btn.dataset.rec); }, 500);
+    });
+    btn.addEventListener("pointerleave", cancelCustomPress);
+    btn.addEventListener("contextmenu", (e) => e.preventDefault()); // menu konteks Android saat tekan lama
+  });
+  const selAllBtn = document.getElementById("customSelAllBtn");
+  if (selAllBtn) selAllBtn.addEventListener("click", () => {
+    customSelect = customSelect.size === customQuizzes.length ? new Set() : new Set(customQuizzes.map((r) => r.id));
+    render();
+  });
+  const selDelBtn = document.getElementById("customSelDelBtn");
+  if (selDelBtn) selDelBtn.addEventListener("click", deleteSelectedCustoms);
 
   const mpOpenBtn = document.getElementById("mpOpenBtn");
   if (mpOpenBtn) mpOpenBtn.addEventListener("click", () => {
